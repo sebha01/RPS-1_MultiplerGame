@@ -1,0 +1,27 @@
+name: File a Task Issue
+description: File a Task report
+title: "[Task]: <title and short description>"
+labels: ["task"]
+projects: ["22"]
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the task issue report and enter what task you wish to be completed on the work already done to the game and what conditions are needed for the feature issue to be closed.
+  - type: textarea
+    id: Task-issue
+    attributes:
+      label: What is the task that you will be assigning?
+      description: Also mention what it will aim to do and include any photos or videos to help show the feature
+      placeholder: Tell us task you want to add!
+      value: "A task needs to be done, this will make our work more organised and manageable!"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Conditions for task issue to be closed
+      description: Please enter the conditions for the issue to be closed so that a realistic aim can be set on resolving this issue.
+      render: shell

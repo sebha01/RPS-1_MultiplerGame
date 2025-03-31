@@ -1,0 +1,27 @@
+name: File a Feature Issue
+description: File a feature report
+title: "[Feature]: <title and short description>"
+labels: ["feature"]
+projects: ["22"]
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the feature report and enter what feature you will be adding to the game, how you will add it and what conditions are needed for the feature issue to be closed.
+  - type: textarea
+    id: Feature-issue
+    attributes:
+      label: What is the feature that you will be adding?
+      description: Also mention what it will add to gameplay and the impact and include any photos or videos to help show the feature 
+      placeholder: Tell us feature you want to add!
+      value: "A feature needs to be added, this will make the game better!"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Conditions for feature issue to be closed
+      description: Please enter the conditions for the issue to be closed so that a realistic aim can be set on resolving this issue.
+      render: shell

@@ -1,0 +1,27 @@
+name: File a Bug Issue
+description: File a bug report
+title: "[Bug]: <title and short description>"
+labels: ["bug"]
+projects: ["22"]
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the bug report and enter what bug you have encountered, how you encountered it and what requirements must be met to have this bug issue close
+  - type: textarea
+    id: Bug-issue
+    attributes:
+      label: What is the bug that you found?
+      description: Also mention how you encountered it and what problems it is causing for gameplay and include any photos or videos to help show the issue 
+      placeholder: Tell us bug you encountered!
+      value: "A bug happened, it needs to be resolved!"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Conditions for bug issue to be closed
+      description: Please enter the conditions for the issue to be closed so that a realistic aim can be set on resolving this issue.
+      render: shell
