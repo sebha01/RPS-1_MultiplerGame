@@ -26,31 +26,11 @@ class ClientGame
 			getline(cin, playerName);
 			cout << endl;
 		}
-
 		string GetName();
 		int validateInput(int minChoice, int maxChoice);
 		void ShowWelcomeScreen();
 		void TakeTurn(int& choice1, int& choice2);
 		int SelectFinalChoice(int c1, int c2);
-
-		int RecieveResult(int result) 
-		{
-			switch (result) {		//If the player made an incorrect input, try again (This could probably be handled entirely by the player)
-				case 1:
-					cout << opponentName << "  got nothing" << endl;
-					break;
-				case 2:
-					cout << opponentName << "  got a match!" << endl;
-					break;
-				case 3:
-					cout << opponentName << "  found the last match." << endl;
-					break;
-			}
-			//cout << "Turn result: " << turnresult << endl;
-
-			return 0;
-		}
-
 		void HandleWin(int win);
 		void GameStarting(string inOpponent);
 		void SetOpponentName(string input);
@@ -116,7 +96,7 @@ void ClientGame::TakeTurn(int& choice1, int& choice2)
 	cout << endl << " Please enter your second choice -> ";
 	choice2 = validateInput(minChoice, maxChoice);
 
-	SelectFinalChoice(choice1, choice2);
+	//SelectFinalChoice(choice1, choice2);
 }
 
 int ClientGame::SelectFinalChoice(int c1, int c2)
@@ -132,16 +112,19 @@ int ClientGame::SelectFinalChoice(int c1, int c2)
 }
 
 
-void ClientGame::HandleWin(int win)
+void ClientGame::HandleWin(int result)
 {
-	if (win == 0) {
+	if (result == 0)
+	{
 		cout << "It's a draw." << endl;
 
 	}
-	else if (win == 1) {
-		cout << "you win!" << endl;
+	else if (result == 1)
+	{
+		cout << "You win!" << endl;
 	}
-	else {
+	else 
+	{
 		cout << opponentName << " won!" << endl;
 	}
 }
