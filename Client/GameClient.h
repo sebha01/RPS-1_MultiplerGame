@@ -165,27 +165,27 @@ class ClientGame
 			}
 			//cout << "Turn result: " << turnresult << endl;
 
-			PrintBoard(Localgrid);
+			//PrintBoard(Localgrid);
 
 			return 0;
 		}
 
-		void PrintBoard(char Localgrid[16]) 
-		{
-			int counter = 0;
-			for (int x = 0; x < 16; x++)
-			{
-				counter++;
-				cout << "|  " << Localgrid[x];	//The grid is shown using this command for testing purposes only must be removed prior to playing
+		//void PrintBoard(char Localgrid[16]) 
+		//{
+		//	int counter = 0;
+		//	for (int x = 0; x < 16; x++)
+		//	{
+		//		counter++;
+		//		cout << "|  " << Localgrid[x];	//The grid is shown using this command for testing purposes only must be removed prior to playing
 
-				if (counter == 4)
-				{
-					cout << "|  " << ("\n");
-					counter = 0;
-				}
+		//		if (counter == 4)
+		//		{
+		//			cout << "|  " << ("\n");
+		//			counter = 0;
+		//		}
 
-			}
-		}
+		//	}
+		//}
 
 		void HandleWin(int win) 
 		{

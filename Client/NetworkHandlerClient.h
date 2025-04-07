@@ -150,12 +150,12 @@ class NetworkHandlerClient
 			}
 			else if (packetType[0] == PROMPT_PACKET) 
 			{
-				SendCards();
+				SendChoices();
 				//Doesnt work for some reason, replaced with MOVE_PACKET \/
 			}
 			else if (packetType[0] == MOVE_PACKET) 
 			{
-				SendCards();
+				SendChoices();
 				//Replaced prompt packet, tells the user to make a move, then sends the cards as a input packet
 			}
 			else if (packetType[0] == END_PACKET) 
@@ -208,22 +208,22 @@ class NetworkHandlerClient
 			//cout << "Test" << endl;
 		}
 
-		void SendCards() 
+		void SendChoices() 
 		{
 			int choice1;  //temporary cards comtainer to be passed as reference
 			int choice2;
 		
 			Game->TakeTurn(choice1, choice2);	//Passes the cards as references
 
-			string Scard1 = (to_string(choice1));		//Translates the cards into strings to be sent
-			string Scard2 = (to_string(choice2));
+			string Schoice1 = (to_string(choice1));		//Translates the cards into strings to be sent
+			string Schoice2 = (to_string(choice2));
 
 			//Sends input packet
 			send(Boss, (char*)&INPUT_PACKET, 1, 0);		
 			//cout << "sending card1: " << Scard1 << endl;
-			send(Boss, Scard1.c_str(), sizeof(Scard1.c_str() + 1), 0);
+			send(Boss, Schoice1.c_str(), sizeof(Schoice1.c_str() + 1), 0);
 			//cout << "sending card2: " << Scard2 << endl;
-			send(Boss, Scard2.c_str(), sizeof(Scard2.c_str() + 1), 0);
+			send(Boss, Schoice2.c_str(), sizeof(Schoice2.c_str() + 1), 0);
 
 		}
 
@@ -252,6 +252,7 @@ class NetworkHandlerClient
 		{
 			int byteRecieved = recv(Boss, buff, 4096, 0);		//recieves players name
 			string Username = string(buff, 0, byteRecieved);	//Translates players name to string
+
 			Game->GameStarting(Username);
 		}
 };
