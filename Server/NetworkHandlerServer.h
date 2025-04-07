@@ -226,7 +226,7 @@ class NetworkHandlerServer
 			Game->RecievePlayerChoices(p1, p2);
 
 			// Call calculate result and send it back to clients
-			int result = Game->calculateresult(p1, p2);
+			int result = Game->calculateResult(p1, p2);
 
 			// Send result back to players
 			send(FocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);

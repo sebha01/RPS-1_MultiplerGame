@@ -40,7 +40,7 @@ class GameServer
 			this->player2Choice = c2;
 		}
 
-		int calculateresult(int p1Choice, int p2Choice) 
+		int calculateResult(int p1Choice, int p2Choice) 
 		{
 			//Return 0 if tie, 1 if player 1 and 2 if player 2
 
