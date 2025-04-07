@@ -155,45 +155,55 @@ class NetworkHandlerServer
 
 		void HandleInput(string packetType) 
 		{	//handles packet types
-			if (packetType[0] == HELLO_PACKET) {
+			if (packetType[0] == HELLO_PACKET) 
+			{
 				//This is now handled else where, so it should never be recieved here.
 				//HandleHello();
 			}
-			else if (packetType[0] == WELCOME_PACKET) {
+			else if (packetType[0] == WELCOME_PACKET) 
+			{
 				//Shouldn't recieve
 				//send(*FocusedSocket, (char*)&PROMPT_PACKET, 1, 0);
 				//In older versions when this system was reactionary and not turn based, joining the server would immediately start the game. This is no longer the case
 			}
-			else if (packetType[0] == START_PACKET) {
+			else if (packetType[0] == START_PACKET) 
+			{
 				//This is sent by the server when the game is ready to start
 				//shouldn't recieve!
 			}
-			else if (packetType[0] == INPUT_PACKET) {
+			else if (packetType[0] == INPUT_PACKET) 
+			{
 				RecievePlayerCards();
 			}
-			else if (packetType[0] == RESULT_PACKET) {
+			else if (packetType[0] == RESULT_PACKET) 
+			{
 				//This is sent by the server to hold the results of a players input
 				//Shouldn't recieve!
 			}
-			else if (packetType[0] == PROMPT_PACKET) {
+			else if (packetType[0] == PROMPT_PACKET) 
+			{
 				//This doesnt work for some reason, replaced with the MOVE_PACKET
 				//Shouldn't recieve!
 			}
-			else if (packetType[0] == MOVE_PACKET) {
+			else if (packetType[0] == MOVE_PACKET) 
+			{
 				//Replaces the prompt packet
 				// Tells the user to make take their turn
 				//Shouldn't recieve!
 			}
 
-			else if (packetType[0] == END_PACKET) {
+			else if (packetType[0] == END_PACKET) 
+			{
 				//Means a client has disconnected or the game is over.
 				this->~NetworkHandlerServer();
 			}
-			else if (packetType[0] == CONCLUSION_PACKET) {
+			else if (packetType[0] == CONCLUSION_PACKET) 
+			{
 				//shouldn't Recieve
 				//Send by the server when the game is over
 			}
-			else {
+			else 
+			{
 				//Hopefully this wont happen
 				cout << "seems like an invalid input..." << packetType << endl;
 				this->~NetworkHandlerServer();
@@ -227,22 +237,32 @@ class NetworkHandlerServer
 			}
 			else 
 			{
-				//cout << "Sending Results packet!" << endl;
-				send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);					//Send the start of a result packet
-				send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);							//sends Map
-				send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);		//sends game result
-				if (result == 2)
-				{
-					FocusedClient->points++;
-				}
-				//Sends to the other player
-				Game->SendMap(card1, card2, Map, false);							//Needs to recalculate the map to not show the opponent the cards
+				////cout << "Sending Results packet!" << endl;
+				//send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);					//Send the start of a result packet
+				//send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);							//sends Map
+				//send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);		//sends game result
+				//if (result == 2)
+				//{
+				//	FocusedClient->points++;
+				//}
+				////Sends to the other player
+				//Game->SendMap(card1, card2, Map, false);							//Needs to recalculate the map to not show the opponent the cards
+				//send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+				//send(UnfocusedClient->ClientSocket, (char*)&Map, 16, 0);
+				//result += 4;														//Increases game game result to show opponent moves
+				//send(UnfocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
+
+				////SendSpectatorsBoard(card1, card2, result);
+
+				// If it's not a win, send the result back to clients
+				send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+				send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);
+				send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
+				// Send to the other player as well
+				Game->SendMap(card1, card2, Map, false);
 				send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
 				send(UnfocusedClient->ClientSocket, (char*)&Map, 16, 0);
-				result += 4;														//Increases game game result to show opponent moves
-				send(UnfocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
-
-				//SendSpectatorsBoard(card1, card2, result);
+				send(UnfocusedClient->ClientSocket, (to_string(result + 4)).c_str(), 8, 0);
 
 				SwapClientFocus();
 
@@ -252,31 +272,40 @@ class NetworkHandlerServer
 
 		void HandleWin() 
 		{
-			int player1Result = 1;
-			int player2Result = 0;
+			//int player1Result = 1;
+			//int player2Result = 0;
 
-			if (FocusedClient->points > UnfocusedClient->points) 
-			{
-				player1Result = 1;
-				player2Result = 2;
-			}
-			else if (FocusedClient->points < UnfocusedClient->points) 
-			{
-				player1Result = 2;
-				player2Result = 1;
-			}
-			else 
-			{
-				player1Result = 0;
-				player2Result = 0;
-			}
+			//if (FocusedClient->points > UnfocusedClient->points) 
+			//{
+			//	player1Result = 1;
+			//	player2Result = 2;
+			//}
+			//else if (FocusedClient->points < UnfocusedClient->points) 
+			//{
+			//	player1Result = 2;
+			//	player2Result = 1;
+			//}
+			//else 
+			//{
+			//	player1Result = 0;
+			//	player2Result = 0;
+			//}
 
 
-			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);					//Send the start of a result packet
-			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);					//Send the start of a result packet
+			//send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);					//Send the start of a result packet
+			//send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);					//Send the start of a result packet
+			//ZeroMemory(buff, 4096);
+			//send(FocusedClient->ClientSocket, (to_string(player1Result)).c_str(), 8, 0);							
+			//send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);		
+			 
+			int player1Result = (FocusedClient->points > UnfocusedClient->points) ? 1 : 0;
+			int player2Result = (FocusedClient->points < UnfocusedClient->points) ? 1 : 0;
+
+			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
+			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			ZeroMemory(buff, 4096);
-			send(FocusedClient->ClientSocket, (to_string(player1Result)).c_str(), 8, 0);							
-			send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);							
+			send(FocusedClient->ClientSocket, (to_string(player1Result)).c_str(), 8, 0);
+			send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);
 		}
 
 		void NotifyGameStart() 
