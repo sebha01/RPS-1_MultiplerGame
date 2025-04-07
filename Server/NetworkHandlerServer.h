@@ -16,12 +16,10 @@ class NetworkHandlerServer
 		fd_set ListenerSpectator;
 		SOCKET listener;
 
-		CLIENT* Spectators[4];		//Allows a maximum of 4 spectators per match
-		int NumOfSpectaors = 0;		//Counts the number of spectators currently watching
-
 		int port;
 	public:
-		NetworkHandlerServer(int inport) {
+		NetworkHandlerServer(int inport) 
+		{
 			port = inport;
 			// Initialise winsock
 			Game = new GameServer();					//Creates the server side of the game
@@ -31,7 +29,8 @@ class NetworkHandlerServer
 
 			int wsok = WSAStartup(ver, &wsData);		//create wsok with version 2.2
 
-			if (wsok != 0) {
+			if (wsok != 0) 
+			{
 				cout << "cannot initialise Socket, Bye!" << endl;
 				this->~NetworkHandlerServer();
 			}
@@ -40,7 +39,8 @@ class NetworkHandlerServer
 			listener = socket(AF_INET, SOCK_STREAM, 0);		//The listener socket is used so the server can Listen for clients trying to connect
 			//The listener socket needs to be closed when all users are connected
 
-			if (listener == INVALID_SOCKET) {
+			if (listener == INVALID_SOCKET) 
+			{
 				closesocket(listener);
 				cout << "Cannot create listener Socket" << endl;
 				this->~NetworkHandlerServer();
@@ -68,7 +68,8 @@ class NetworkHandlerServer
 			FD_SET(listener, &master);	//Adds listener socket to the master set 
 
 			int socketCount = 0;
-			while (socketCount < 2) {
+			while (socketCount < 2) 
+			{
 
 				sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
 				int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
@@ -76,14 +77,16 @@ class NetworkHandlerServer
 				//NewClient.ClientSocket = accept(listener, (sockaddr*)&client, &clientSize);					//Wait for a client to attempt to connect, then set it to NEWCLIENT																//Adds the new client to the master set
 				//cout << "Sending hello to joining client (" << NewClient.ClientSocket << ")" << endl;		//Prints the socket address number, not the name. This can be used for tracking
 
-				if ((FocusedClient == nullptr) and (socketCount == 0)) {
+				if ((FocusedClient == nullptr) and (socketCount == 0)) 
+				{
 					FocusedClient = new CLIENT;
 					FocusedClient->ClientSocket = accept(listener, (sockaddr*)&client, &clientSize);
 					recv(FocusedClient->ClientSocket, buff, 1, 0);		//Wait for the client to send a hello packet to recieve its name
 					HandleHello(*FocusedClient);
 
 				}
-				else {
+				else 
+				{
 					UnfocusedClient = new CLIENT;
 					UnfocusedClient->ClientSocket = accept(listener, (sockaddr*)&client, &clientSize);
 					recv(UnfocusedClient->ClientSocket, buff, 1, 0);		//Wait for the client to send a hello packet to recieve its name
@@ -110,34 +113,36 @@ class NetworkHandlerServer
 			GameLoop();		//begin the game loop
 		}
 
-		~NetworkHandlerServer() {
+		~NetworkHandlerServer() 
+		{
 			cout << "Shutdown!!!" << endl;
 			send(FocusedClient->ClientSocket, (char*)&END_PACKET, 1, 0);	//Tells each client that the server is shutting down
 			send(UnfocusedClient->ClientSocket, (char*)&END_PACKET, 1, 0);
 			closesocket(UnfocusedClient->ClientSocket);					//Closes both sockets
 			closesocket(FocusedClient->ClientSocket);
 			closesocket(listener);
-			for (int i = 0; i < NumOfSpectaors; i++) {
-				closesocket(Spectators[i]->ClientSocket);
-			}
 			WSACleanup();									//Clean up network
 			//delete *Game;									//Delete the game
 		}
 
-		void GameLoop() {		//The main loop of the class, handles all inputs
-			while (true) {
+		void GameLoop() 
+		{		//The main loop of the class, handles all inputs
+			while (true) 
+			{
 				//CheckSpectatorListenerSocket();
 				ZeroMemory(buff, 4096);		//Unsure what this does but it feels important
 
 				//wait for client to send a packet header
 				int bytesRecieved = recv(FocusedClient->ClientSocket, buff, 1, 0);		//Holds inputted data
 
-				if ((bytesRecieved == SOCKET_ERROR)) {
+				if ((bytesRecieved == SOCKET_ERROR)) 
+				{
 					cerr << "Client disconnected, shutting down." << endl;
 					this->~NetworkHandlerServer();
 					break;
 				}
-				else if ((bytesRecieved == 0)) {
+				else if ((bytesRecieved == 0)) 
+				{
 					cerr << "Packet lost, shutting down." << endl;
 					this->~NetworkHandlerServer();
 					break;
@@ -148,9 +153,8 @@ class NetworkHandlerServer
 			}
 		}
 
-		void HandleInput(string packetType) {	//handles packet types
-			//cout << "Handling " << packetType << " Packet" << endl;
-			//cout << "Handling " << packetType << " Packet" << endl;
+		void HandleInput(string packetType) 
+		{	//handles packet types
 			if (packetType[0] == HELLO_PACKET) {
 				//This is now handled else where, so it should never be recieved here.
 				//HandleHello();
@@ -197,7 +201,8 @@ class NetworkHandlerServer
 
 		}
 
-		void RecievePlayerCards() {
+		void RecievePlayerCards() 
+		{
 			//Input handling
 			int byteRecieved = recv(FocusedClient->ClientSocket, buff, 8, 0);			//Recieves the first card as an integer
 			string SCard1 = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
@@ -216,10 +221,12 @@ class NetworkHandlerServer
 			Game->SendMap(card1, card2, Map, true);							//Recieves the map from the server, updating the map variable
 
 			//Sends to the player that made the move
-			if (result == 4) {
+			if (result == 4) 
+			{
 				HandleWin();
 			}
-			else {
+			else 
+			{
 				//cout << "Sending Results packet!" << endl;
 				send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);					//Send the start of a result packet
 				send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);							//sends Map
@@ -243,18 +250,23 @@ class NetworkHandlerServer
 			}
 		}
 
-		void HandleWin() {
+		void HandleWin() 
+		{
 			int player1Result = 1;
 			int player2Result = 0;
-			if (FocusedClient->points > UnfocusedClient->points) {
+
+			if (FocusedClient->points > UnfocusedClient->points) 
+			{
 				player1Result = 1;
 				player2Result = 2;
 			}
-			else if (FocusedClient->points < UnfocusedClient->points) {
+			else if (FocusedClient->points < UnfocusedClient->points) 
+			{
 				player1Result = 2;
 				player2Result = 1;
 			}
-			else {
+			else 
+			{
 				player1Result = 0;
 				player2Result = 0;
 			}
@@ -267,7 +279,8 @@ class NetworkHandlerServer
 			send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);							
 		}
 
-		void NotifyGameStart() {	//tells each user that the game is ready to start, and the name of their opponent.
+		void NotifyGameStart() 
+		{	//tells each user that the game is ready to start, and the name of their opponent.
 
 			send(FocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);					//Send the start of a start packet
 			send(FocusedClient->ClientSocket, UnfocusedClient->ClientName.c_str(), UnfocusedClient->ClientName.size() + 1, 0);			//sends opponents name
@@ -277,7 +290,8 @@ class NetworkHandlerServer
 
 		}
 
-		void HandleHello(CLIENT& Newclient) {
+		void HandleHello(CLIENT& Newclient) 
+		{
 			int byteRecieved = recv(Newclient.ClientSocket, buff, 4096, 0);		//recieves players name
 			//might want to save this somehow so the clients can know who they are up against
 
@@ -288,7 +302,8 @@ class NetworkHandlerServer
 			send(Newclient.ClientSocket, (char*)&WELCOME_PACKET, 1, 0);		//sends welcome packet to client
 		}
 
-		void SwapClientFocus() {
+		void SwapClientFocus() 
+		{
 			CLIENT* temp;		//Temporary socket used for swapping
 			temp = UnfocusedClient;
 			UnfocusedClient = FocusedClient;

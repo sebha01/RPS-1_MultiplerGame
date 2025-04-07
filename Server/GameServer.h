@@ -8,13 +8,15 @@ class GameServer
 		char grid[16] = { 'a', 'a', 'b', 'b', 'c', 'c', 'd', 'd', 'e', 'e', 'f', 'f', 'g', 'g', 'h', 'h' };  //this should be unaccessable to the client, only the server knows the board state
 	public:
 
-		GameServer() {
+		GameServer() 
+		{
 			//randomise Grid!
 			random_shuffle(&grid[0], &grid[16]);
 
 		}
 
-		int RecieveInputOne(int card1, int card2) {
+		int RecieveInputOne(int card1, int card2) 
+		{
 			//This would be recieved as a packet from the client instead of a function call
 			//recieve card one				
 			//receive card two
@@ -23,7 +25,8 @@ class GameServer
 			return 1;
 		}
 
-		int calculateresult(int card1, int card2) {
+		int calculateresult(int card1, int card2) 
+		{
 			int counter = 0;						//This resets the counter
 			int returnflag = 0;
 			if ((grid[card1] == 'x') || (grid[card2] == 'x'))		//This 'if statment' states if you have made the choice 
@@ -46,38 +49,51 @@ class GameServer
 				//fail
 			}
 			if (checkwin()) {returnflag = 4;}
+
 			return returnflag;
 		}
 
-		bool checkwin() {
+		bool checkwin() 
+		{
 			//probably a nicer way to do this
 			bool found = false;
 			int i = 0;
-			while ((found == false) and (i < 16)) {		//Checks through the board for anything that isnt an x(to signify its been found)
-				if (grid[i] != 'x') {
+
+			while ((found == false) and (i < 16)) 
+			{		//Checks through the board for anything that isnt an x(to signify its been found)
+				if (grid[i] != 'x') 
+				{
 					found = true;
 				}
+
 				i++;
 			}
 			return not found;
 		}
 
-		void SendMap(int card1, int card2, char OutGrid[16], bool currentPlayer)	 {
+		void SendMap(int card1, int card2, char OutGrid[16], bool currentPlayer)	 
+		{
 			//char returngrid[17];
 
-			for (int i = 0; i < 16; i++) {
-				if (grid[i] == 'x') {
+			for (int i = 0; i < 16; i++) 
+			{
+				if (grid[i] == 'x') 
+				{
 					OutGrid[i] = 'x';
 				}
-				else if ((i == card1) or (i == card2)) {
-					if (currentPlayer) {
+				else if ((i == card1) or (i == card2)) 
+				{
+					if (currentPlayer) 
+					{
 						OutGrid[i] = grid[i];
 					}
-					else {
+					else 
+					{
 						OutGrid[i] = '?';
 					}
 				}
-				else {
+				else 
+				{
 					OutGrid[i] = ' ';
 				}
 			}
