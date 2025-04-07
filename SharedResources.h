@@ -1,8 +1,14 @@
 #pragma once
+
 #include <WS2tcpip.h>
-#include <string>
 #include <iostream>
+#include <string>
+#include <algorithm>
+#include <ctime>
+
 #pragma comment (lib, "ws2_32.lib")
+
+using namespace std;
 
 char static const	HELLO_PACKET =		'H';		//General hello
 char static const	WELCOME_PACKET =	'W';		//Welcomes client to loaded server
@@ -18,8 +24,31 @@ char static const	SPECTATOR_PACKET  = '-';		//Used to send the game to any spect
 
 char buff[4096];
 
-struct CLIENT {
+struct CLIENT 
+{
 	SOCKET ClientSocket = 0;
-	std::string ClientName;
+	string ClientName;
 	int points = 0;
 };
+
+enum Choices
+{
+	ROCK = 1,
+	PAPER = 2,
+	SCISSORS = 3
+};
+
+string ChoiceToString(int choice)
+{
+    switch (choice)
+    {
+        case 1: 
+            return "Rock";
+        case 2: 
+            return "Paper";
+        case 3: 
+            return "Scissors";
+        default: 
+            return "";
+    }
+}

@@ -2,7 +2,11 @@
 #include "..\SharedResources.h"
 #include "GameServer.h"
 
-using namespace std;
+/*
+----------------------------------------------------------------
+						CLASS DEFINITION
+----------------------------------------------------------------
+*/
 
 class NetworkHandlerServer
 {

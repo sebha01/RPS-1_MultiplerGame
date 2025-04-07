@@ -1,8 +1,12 @@
 #pragma once
-#include <iostream>
-#include <algorithm>
 
-using namespace std;
+#include "../SharedResources.h"
+
+/*
+----------------------------------------------------------------
+						CLASS DEFINITION
+----------------------------------------------------------------
+*/
 
 class GameServer
 {
@@ -15,12 +19,6 @@ class GameServer
 		bool player1Win = false;
 		bool player2Win = false;
 
-		enum Choices
-		{
-			ROCK = 1,
-			PAPER = 2,
-			SCISSORS = 3
-		};
 	public:
 
 		GameServer() 

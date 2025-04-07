@@ -2,7 +2,11 @@
 #include "..\SharedResources.h"
 #include "GameClient.h"
 
-using namespace std;
+/*
+----------------------------------------------------------------
+						CLASS DEFINITION
+----------------------------------------------------------------
+*/
 
 class NetworkHandlerClient
 {
@@ -10,10 +14,8 @@ class NetworkHandlerClient
 		SOCKET Boss;
 		ClientGame *Game = nullptr;
 
-		bool IsSpectator = false;
-
 	public:
-		NetworkHandlerClient(std::string Ip, int port) 
+		NetworkHandlerClient(string Ip, int port) 
 		{
 			Game = new ClientGame();  //Create client game
 			//initialise winsock
@@ -23,7 +25,7 @@ class NetworkHandlerClient
 			int wsok = WSAStartup(ver, &wsData);		//create wsok with version 2.2
 
 			if (wsok != 0) {
-				std::cerr << "cannot initialise Socket, Bye!" << std::endl;
+				cerr << "cannot initialise Socket, Bye!" << endl;
 				this->~NetworkHandlerClient();
 				return;
 			}
@@ -31,7 +33,7 @@ class NetworkHandlerClient
 			Boss = socket(AF_INET, SOCK_STREAM, 0);		//Boss is the server
 
 			if (Boss == INVALID_SOCKET) {
-				std::cerr << "Cannot create server Socket" << std::endl;
+				cerr << "Cannot create server Socket" << endl;
 				this->~NetworkHandlerClient();
 				return;
 			}
@@ -48,10 +50,10 @@ class NetworkHandlerClient
 			int connectionResult = -1;
 			while (connectionResult == -1) {
 				connectionResult = connect(Boss, (sockaddr*)&hint, sizeof(hint));		//attempt to connect to the server defined in hint
-				//std::cout << connectionResult;
+				//cout << connectionResult;
 			}
 			//if (connectionResult == SOCKET_ERROR) {
-			//	std::cerr << "cannot connect to server" << std::endl;
+			//	cerr << "cannot connect to server" << endl;
 			//	this->~NetworkHandlerClient();
 			//	return;
 			//}
@@ -61,24 +63,24 @@ class NetworkHandlerClient
 
 		~NetworkHandlerClient() {  //destructor
 			//closesocket(Boss);
-			std::cout << "Connection terminated." << std::endl;
+			cout << "Connection terminated." << endl;
 			closesocket(Boss);		//Closes the server socket
 			WSACleanup();
 		}
 
 		//Old function, ignore
 		void InputLoop() {  //depricated
-			std::string userInput;
+			string userInput;
 			do {
-				//std::cout << "input please" << std::endl;
-				std::getline(std::cin, userInput);	//ask for input
+				//cout << "input please" << endl;
+				getline(cin, userInput);	//ask for input
 				if (userInput.size() > 0) {
 					int sendResult = send(Boss, userInput.c_str(), userInput.size() + 1, 0);
 					if (sendResult != SOCKET_ERROR) {
 						ZeroMemory(buff, 4096);
 						int bytesRecieved = recv(Boss, buff, 4096, 0);
 						if (bytesRecieved > 0) {
-							std::cout << "Server says: " << std::string(buff, 0, bytesRecieved) << std::endl;
+							cout << "Server says: " << string(buff, 0, bytesRecieved) << endl;
 						}
 					}
 				}
@@ -94,29 +96,29 @@ class NetworkHandlerClient
 			SendHello();	//Straight after a successful connection, try to send a Hello packet to the sever
 			while (true) {
 				ZeroMemory(buff, 4096);	//guessing this is important
-				//std::cout << "Waiting for input <3" << std::endl;
+				//cout << "Waiting for input <3" << endl;
 
 				int bytesRecieved = recv(Boss, buff, 1, 0);		//waits for a packet header from the server
 
 				if ((bytesRecieved == SOCKET_ERROR)) {
-					std::cerr << "Server Lost, shutting down." << std::endl;
+					cerr << "Server Lost, shutting down." << endl;
 					this->~NetworkHandlerClient();
 					break;
 				}
 				else if ((bytesRecieved == 0)) {
-					std::cerr << "Packet lost, shutting down." << std::endl;
+					cerr << "Packet lost, shutting down." << endl;
 					this->~NetworkHandlerClient();
 					break;
 				}
 
-				std::string PacketType = std::string(buff, 0, bytesRecieved);		//turns the packet header into a string
+				string PacketType = string(buff, 0, bytesRecieved);		//turns the packet header into a string
 				HandleInput(PacketType);		//decides what to do with the packet header
 		
 			}
 		}
 
-		void HandleInput(std::string packetType) {
-			//std::cout << "Handling " << packetType << " Packet" << std::endl;
+		void HandleInput(string packetType) {
+			//cout << "Handling " << packetType << " Packet" << endl;
 			if (packetType[0] == HELLO_PACKET) {
 				//shouldn't recieve!
 				//Sent to server when starting
@@ -156,7 +158,7 @@ class NetworkHandlerClient
 			}
 			else {
 				//hopefully this wont happen anymore
-				std::cout << "seems like an invalid input..." << packetType << std::endl;
+				cout << "seems like an invalid input..." << packetType << endl;
 				this->~NetworkHandlerClient();
 			}
 		}
@@ -169,14 +171,14 @@ class NetworkHandlerClient
 
 			//Board result!!
 			byteRecieved = recv(Boss, buff, 16, 0);						//Recieves the second game result, the updated board.
-			std::string Tempstring = std::string(buff, 0, byteRecieved);				//Translates the result into a plaintext string
+			string Tempstring = string(buff, 0, byteRecieved);				//Translates the result into a plaintext string
 			translateString(Board, Tempstring);								//Translates the result into a string using the custom Translate string function
 
 			//Game result!!
 			byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the first Game result, the game result.
-			Tempstring = std::string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
+			Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 			Turnresult = stoi(Tempstring);									//Translates the result into an integer
-			//std::cout << "Game result: " << Turnresult << std::endl;
+			//cout << "Game result: " << Turnresult << endl;
 
 			temp = Game->RecieveResult(Turnresult, Board);					//Passes the board and game result into the gameclient
 			if (Turnresult == 4 or Turnresult == 8) {						//4 is a player win, 8 is a opponent win
@@ -185,11 +187,11 @@ class NetworkHandlerClient
 			}
 		}
 
-		void translateString(char outboard[16], std::string instring) {	//Used to convert string into a board
+		void translateString(char outboard[16], string instring) {	//Used to convert string into a board
 			for (int i = 0; i < 16; i++) {
 				outboard[i] = instring[i];
 			}
-			//std::cout << "Test" << std::endl;
+			//cout << "Test" << endl;
 		}
 
 		void SendCards() {
@@ -198,14 +200,14 @@ class NetworkHandlerClient
 		
 			Game->TakeTurn(card1, card2);	//Passes the cards as references
 
-			std::string Scard1 = (std::to_string(card1));		//Translates the cards into strings to be sent
-			std::string Scard2 = (std::to_string(card2));
+			string Scard1 = (to_string(card1));		//Translates the cards into strings to be sent
+			string Scard2 = (to_string(card2));
 
 			//Sends input packet
 			send(Boss, (char*)&INPUT_PACKET, 1, 0);		
-			//std::cout << "sending card1: " << Scard1 << std::endl;
+			//cout << "sending card1: " << Scard1 << endl;
 			send(Boss, Scard1.c_str(), sizeof(Scard1.c_str() + 1), 0);
-			//std::cout << "sending card2: " << Scard2 << std::endl;
+			//cout << "sending card2: " << Scard2 << endl;
 			send(Boss, Scard2.c_str(), sizeof(Scard2.c_str() + 1), 0);
 
 		}
@@ -221,7 +223,7 @@ class NetworkHandlerClient
 			char result;
 			ZeroMemory(buff, 4096);
 			byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the second game result, the updated board.
-			std::string Tempstring = std::string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
+			string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 			result = stoi(Tempstring);
 			Game->HandleWin(result);
 			this->~NetworkHandlerClient();
@@ -229,20 +231,20 @@ class NetworkHandlerClient
 
 		void HandleStart() {
 			int byteRecieved = recv(Boss, buff, 4096, 0);		//recieves players name
-			std::string Username = std::string(buff, 0, byteRecieved);	//Translates players name to string
+			string Username = string(buff, 0, byteRecieved);	//Translates players name to string
 			Game->GameStarting(Username);
 		}
 	
 		void HandleSpectatorPacket() {
 	
 			if (!IsSpectator) {
-				std::cout << "The lobby you joined is full, You have been added as a spectator." << std::endl;
+				cout << "The lobby you joined is full, You have been added as a spectator." << endl;
 				IsSpectator = true;
 			}
 			else {
 				int byteRecieved;												//Messages are sent as integers, so this holds that infomation to be translated
 				byteRecieved = recv(Boss, buff, 8, 0);							//Recieves the players name;
-				Game->SetOpponentName(std::string(buff, 0, byteRecieved));		//Translates the result into a plaintext string, then sets it to the opponents name
+				Game->SetOpponentName(string(buff, 0, byteRecieved));		//Translates the result into a plaintext string, then sets it to the opponents name
 				ReadGameResults();												//Lets read game results handle the rest, treating the current player always as the opponent
 		
 			}
