@@ -7,104 +7,76 @@ using namespace std;
 class GameServer
 {
 	private:
-		char grid[16] = { 'a', 'a', 'b', 'b', 'c', 'c', 'd', 'd', 'e', 'e', 'f', 'f', 'g', 'g', 'h', 'h' };  //this should be unaccessable to the client, only the server knows the board state
+		int player1Choice = 0;
+		int player2Choice = 0;
+		int bestOf = 0;
+		int p1Score = 0;
+		int p2Score = 0;
+		bool player1Win = false;
+		bool player2Win = false;
+
+		enum Choices
+		{
+			ROCK = 1,
+			PAPER = 2,
+			SCISSORS = 3
+		};
 	public:
 
 		GameServer() 
 		{
-			//randomise Grid!
-			random_shuffle(&grid[0], &grid[16]);
-
+			player1Choice = 0;
+			player2Choice = 0;
+			p1Score = 0;
+			p2Score = 0;
 		}
 
-		int RecieveInputOne(int card1, int card2) 
+		void RecievePlayerChoices(int c1, int c2) 
 		{
 			//This would be recieved as a packet from the client instead of a function call
 			//recieve card one				
 			//receive card two
-			return calculateresult(card1, card2);
-			//SendresultPlayerOne();
-			return 1;
+			this->player1Choice = c1;
+			this->player2Choice = c2;
 		}
 
-		int calculateresult(int card1, int card2) 
+		int calculateresult(int p1Choice, int p2Choice) 
 		{
-			int counter = 0;						//This resets the counter
-			int returnflag = 0;
-			if ((grid[card1] == 'x') || (grid[card2] == 'x'))		//This 'if statment' states if you have made the choice 
-			{
-				returnflag = 1;//cout << ("\nUnfortunately you have selected a card already matched, please try again\n\n");
+			//Return 0 if tie, 1 if player 1 and 2 if player 2
 
-				//try again
-			}
-			else if ((grid[card1] == grid[card2]) && (grid[card1] != 'x') && (grid[card2] != 'x')) //This is the 'if statment' that will match the pairs and then mark them as 'x' 
+			if (p1Choice == p2Choice) { return 0; };
+
+			//Calculate winning plays for p1, if anything else p2 wins
+			if ((p1Choice == ROCK && p2Choice == SCISSORS) ||
+				(p1Choice == PAPER && p2Choice == ROCK) ||
+				(p1Choice == SCISSORS && p2Choice == PAPER))
 			{
-				//cout << ("\nCongratulations you have found a pair!!\n");
-				grid[card1] = 'x';
-				grid[card2] = 'x';
-				returnflag = 2;
-				//pair
-			}
-			else if (((grid[card1] != grid[card2]) && (grid[card1] != 'x') && (grid[card2] != 'x'))) //This 'if statment' states if the guesses are incorrect
-			{
-				returnflag = 3;//cout << ("\nOopps remember the cards as you need to try again\n\n");
-				//fail
+				return 1;
 			}
 
-			if (checkwin()) 
-			{
-				returnflag = 4;
-			}
-
-			return returnflag;
+			//p2 wins if nothing else complete as we have deduced it is not a draw and p2 has not won
+			return 2;
 		}
 
 		bool checkwin() 
 		{
-			//probably a nicer way to do this
-			bool found = false;
-			int i = 0;
-
-			while ((found == false) and (i < 16)) 
-			{		//Checks through the board for anything that isnt an x(to signify its been found)
-				if (grid[i] != 'x') 
-				{
-					found = true;
-				}
-				i++;
+			if (p1Score >= bestOf / 2 + 1) 
+			{
+				player1Win = true;
+				return true;
 			}
-
-			return not found;
+			else if (p2Score >= bestOf / 2 + 1) 
+			{
+				player2Win = true;
+				return true;
+			}
+			return false;
 		}
 
-		void SendMap(int card1, int card2, char OutGrid[16], bool currentPlayer)	 
+		void SendResult(int result, CLIENT* client) 
 		{
-			//char returngrid[17];
-
-			for (int i = 0; i < 16; i++) 
-			{
-				if (grid[i] == 'x') 
-				{
-					OutGrid[i] = 'x';
-				}
-				else if ((i == card1) or (i == card2)) 
-				{
-					if (currentPlayer) 
-					{
-						OutGrid[i] = grid[i];
-					}
-					else 
-					{
-						OutGrid[i] = '?';
-					}
-				}
-				else 
-				{
-					OutGrid[i] = ' ';
-				}
-			}
-			//Send the empty map, with cleared boxes shown
-			//OutGrid = returngrid;
+			// Send result back to the client
+			send(client->ClientSocket, (char*)&result, sizeof(result), 0);
 		}
 };
 

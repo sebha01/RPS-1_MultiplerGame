@@ -3,7 +3,6 @@
 #include "GameClient.h"
 
 
-
 class NetworkHandlerClient
 {
 private:
@@ -13,7 +12,8 @@ private:
 	bool IsSpectator = false;
 
 public:
-	NetworkHandlerClient(std::string Ip, int port) {
+	NetworkHandlerClient(std::string Ip, int port) 
+	{
 		Game = new ClientGame();  //Create client game
 		//initialise winsock
 		WSADATA wsData;
