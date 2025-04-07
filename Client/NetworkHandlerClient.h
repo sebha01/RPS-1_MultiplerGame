@@ -203,13 +203,13 @@ class NetworkHandlerClient
 		}
 
 
-		void translateString(char outboard[16], string instring) 
-		{	//Used to convert string into a board
-			for (int i = 0; i < 16; i++) {
-				outboard[i] = instring[i];
-			}
-			//cout << "Test" << endl;
-		}
+		//void translateString(char outboard[16], string instring) 
+		//{	//Used to convert string into a board
+		//	for (int i = 0; i < 16; i++) {
+		//		outboard[i] = instring[i];
+		//	}
+		//	//cout << "Test" << endl;
+		//}
 
 		void SendChoices() 
 		{
