@@ -19,7 +19,6 @@ char static const	PROMPT_PACKET =		'P';		//Unused
 char static const	MOVE_PACKET =		'M';		//Prompts the player to take their turn
 char static const	END_PACKET =		'E';		//The program has been exited.
 char static const	CONCLUSION_PACKET =	'C';		//The game has ended, send results			(W.I.P)
-char static const	SPECTATOR_PACKET  = '-';		//Used to send the game to any spectators
 
 
 char buff[4096];

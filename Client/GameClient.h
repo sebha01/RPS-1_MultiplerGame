@@ -95,8 +95,6 @@ void ClientGame::TakeTurn(int& choice1, int& choice2)
 
 	cout << endl << " Please enter your second choice -> ";
 	choice2 = validateInput(minChoice, maxChoice);
-
-	//SelectFinalChoice(choice1, choice2);
 }
 
 int ClientGame::SelectFinalChoice(int c1, int c2)
