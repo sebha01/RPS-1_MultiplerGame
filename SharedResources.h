@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <ctime>
+#include <memory>
 
 #pragma comment (lib, "ws2_32.lib")
 

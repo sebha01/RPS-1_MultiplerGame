@@ -12,12 +12,12 @@ class NetworkHandlerClient
 {
 	private:
 		SOCKET Boss;
-		ClientGame *Game = nullptr;
+		unique_ptr<ClientGame> Game = nullptr;
 
 	public:
-		NetworkHandlerClient(string Ip, int port) 
+		NetworkHandlerClient(string Ip, int port)
 		{
-			Game = new ClientGame();  //Create client game
+			Game = make_unique<ClientGame>();  //Create client game
 
 			//initialise winsock
 			WSADATA wsData;
