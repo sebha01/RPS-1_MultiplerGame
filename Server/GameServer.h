@@ -13,11 +13,6 @@ class GameServer
 	private:
 		int player1Choice = 0;
 		int player2Choice = 0;
-		int bestOf = 0;
-		int p1Score = 0;
-		int p2Score = 0;
-		bool player1Win = false;
-		bool player2Win = false;
 
 	public:
 
@@ -25,8 +20,6 @@ class GameServer
 		{
 			player1Choice = 0;
 			player2Choice = 0;
-			p1Score = 0;
-			p2Score = 0;
 		}
 
 		void RecievePlayerChoices(int c1, int c2) 
@@ -54,21 +47,6 @@ class GameServer
 
 			//p2 wins if nothing else complete as we have deduced it is not a draw and p2 has not won
 			return 2;
-		}
-
-		bool checkwin() 
-		{
-			if (p1Score >= bestOf / 2 + 1) 
-			{
-				player1Win = true;
-				return true;
-			}
-			else if (p2Score >= bestOf / 2 + 1) 
-			{
-				player2Win = true;
-				return true;
-			}
-			return false;
 		}
 
 		void SendResult(int result, CLIENT* client) 

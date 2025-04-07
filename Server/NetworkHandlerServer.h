@@ -81,7 +81,7 @@ class NetworkHandlerServer
 				int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
 				//CLIENT NewClient;
 				//NewClient.ClientSocket = accept(listener, (sockaddr*)&client, &clientSize);					//Wait for a client to attempt to connect, then set it to NEWCLIENT																//Adds the new client to the master set
-				//std::cout << "Sending hello to joining client (" << NewClient.ClientSocket << ")" << std::endl;		//Prints the socket address number, not the name. This can be used for tracking
+				//cout << "Sending hello to joining client (" << NewClient.ClientSocket << ")" << endl;		//Prints the socket address number, not the name. This can be used for tracking
 
 				if ((FocusedClient == nullptr) and (socketCount == 0)) 
 				{
@@ -132,35 +132,90 @@ class NetworkHandlerServer
 
 		void GameLoop() 
 		{		//The main loop of the class, handles all inputs
-			while (true) 
+			send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+			send(UnfocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+
+			int p1 = -1, p2 = -1;
+
+			//while (true) 
+			//{
+			//	ZeroMemory(buff, 4096);		//Unsure what this does but it feels important
+
+			//	//wait for client to send a packet header
+			//	int bytesRecieved = recv(FocusedClient->ClientSocket, buff, 1, 0);		//Holds inputted data
+
+			//	if ((bytesRecieved == SOCKET_ERROR)) 
+			//	{
+			//		cerr << "Client disconnected, shutting down." << endl;
+			//		this->~NetworkHandlerServer();
+			//		break;
+			//	}
+			//	else if ((bytesRecieved == 0)) 
+			//	{
+			//		cerr << "Packet lost, shutting down." << endl;
+			//		this->~NetworkHandlerServer();
+			//		break;
+			//	}
+
+			//	string PacketType = string(buff, 0, bytesRecieved);	//Translates the packet header into a string
+			//	HandleInput(PacketType);										//Decides how to handle each type of packet
+			//}
+
+			while (true)
 			{
-				ZeroMemory(buff, 4096);		//Unsure what this does but it feels important
+				fd_set readfds;
+				FD_ZERO(&readfds);
+				FD_SET(FocusedClient->ClientSocket, &readfds);
+				FD_SET(UnfocusedClient->ClientSocket, &readfds);
 
-				//wait for client to send a packet header
-				int bytesRecieved = recv(FocusedClient->ClientSocket, buff, 1, 0);		//Holds inputted data
+				int maxSock = max(FocusedClient->ClientSocket, UnfocusedClient->ClientSocket) + 1;
+				int activity = select(maxSock, &readfds, NULL, NULL, NULL);
 
-				if ((bytesRecieved == SOCKET_ERROR)) 
-				{
-					cerr << "Client disconnected, shutting down." << endl;
-					this->~NetworkHandlerServer();
-					break;
-				}
-				else if ((bytesRecieved == 0)) 
-				{
-					cerr << "Packet lost, shutting down." << endl;
-					this->~NetworkHandlerServer();
+				if (activity < 0) {
+					cerr << "select error" << endl;
 					break;
 				}
 
-				string PacketType = string(buff, 0, bytesRecieved);	//Translates the packet header into a string
-				HandleInput(PacketType);										//Decides how to handle each type of packet
+				if (FD_ISSET(FocusedClient->ClientSocket, &readfds) && p1 == -1) {
+					recv(FocusedClient->ClientSocket, buff, 8, 0);
+					p1 = std::stoi(std::string(buff, 0, 8));
+				}
+
+				if (FD_ISSET(UnfocusedClient->ClientSocket, &readfds) && p2 == -1) {
+					recv(UnfocusedClient->ClientSocket, buff, 8, 0);
+					p2 = std::stoi(std::string(buff, 0, 8));
+				}
+
+				// Once both choices are received
+				if (p1 != -1 && p2 != -1) {
+					Game->RecievePlayerChoices(p1, p2);
+					int result = Game->calculateResult(p1, p2);
+					send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+					send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+					send(FocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);
+					send(UnfocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);
+
+					// Reset for next round or break if game is over
+					p1 = p2 = -1;
+
+					// Example: check points and end if needed
+					if (result ==1 || result == 2) 
+					{
+						HandleWin(result);
+						break;
+					}
+
+					// prompt for next round
+					send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+					send(UnfocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+				}
 			}
 		}
 
-		void HandleInput(std::string packetType) 
+		void HandleInput(string packetType) 
 		{	//handles packet types
-			//std::cout << "Handling " << packetType << " Packet" << std::endl;
-			//std::cout << "Handling " << packetType << " Packet" << std::endl;
+			//cout << "Handling " << packetType << " Packet" << endl;
+			//cout << "Handling " << packetType << " Packet" << endl;
 			if (packetType[0] == HELLO_PACKET) 
 			{
 				//This is now handled else where, so it should never be recieved here.
@@ -179,7 +234,7 @@ class NetworkHandlerServer
 			}
 			else if (packetType[0] == INPUT_PACKET) 
 			{
-				RecievePlayerChoices();
+				//RecievePlayerChoices();
 			}
 			else if (packetType[0] == RESULT_PACKET) 
 			{
@@ -217,51 +272,36 @@ class NetworkHandlerServer
 
 		}
 
-		void RecievePlayerChoices() 
+		//void RecievePlayerChoices() 
+		//{
+		//	int p1Choice = recv(FocusedClient->ClientSocket, buff, 8, 0); // Receive Player 1's choice
+		//	int p2Choice = recv(UnfocusedClient->ClientSocket, buff, 8, 0); // Receive Player 2's choice
+
+		//	// Convert from string to integer (or directly if data is already in integer format)
+		//	int p1 = stoi(string(buff, 0, p1Choice));
+		//	int p2 = stoi(string(buff, 0, p2Choice));
+
+		//	// Pass the choices to GameServer
+		//	Game->RecievePlayerChoices(p1, p2);
+
+		//	// Call calculate result and send it back to clients
+		//	int result = Game->calculateResult(p1, p2);
+
+		//	// Send result back to players
+		//	send(FocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);
+		//	send(UnfocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);
+		//}
+
+		void HandleWin(int result) 
 		{
-			int p1Choice = recv(FocusedClient->ClientSocket, buff, 8, 0); // Receive Player 1's choice
-			int p2Choice = recv(UnfocusedClient->ClientSocket, buff, 8, 0); // Receive Player 2's choice
+			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
+			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 
-			// Convert from string to integer (or directly if data is already in integer format)
-			int p1 = std::stoi(std::string(buff, 0, p1Choice));
-			int p2 = std::stoi(std::string(buff, 0, p2Choice));
+			string p1Result = result == 1 ? "1" : result == 2 ? "0" : "0"; // 1 = win, 0 = loss/draw
+			string p2Result = result == 2 ? "1" : result == 1 ? "0" : "0";
 
-			// Pass the choices to GameServer
-			Game->RecievePlayerChoices(p1, p2);
-
-			// Call calculate result and send it back to clients
-			int result = Game->calculateResult(p1, p2);
-
-			// Send result back to players
-			send(FocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);
-			send(UnfocusedClient->ClientSocket, (char*)&result, sizeof(result), 0);
-		}
-
-		void HandleWin() 
-		{
-			int player1Result = 1;
-			int player2Result = 0;
-			if (FocusedClient->points > UnfocusedClient->points) 
-			{
-				player1Result = 1;
-				player2Result = 2;
-			}
-			else if (FocusedClient->points < UnfocusedClient->points) 
-			{
-				player1Result = 2;
-				player2Result = 1;
-			}
-			else {
-				player1Result = 0;
-				player2Result = 0;
-			}
-
-
-			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);					//Send the start of a result packet
-			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);					//Send the start of a result packet
-			ZeroMemory(buff, 4096);
-			send(FocusedClient->ClientSocket, (std::to_string(player1Result)).c_str(), 8, 0);							
-			send(UnfocusedClient->ClientSocket, (std::to_string(player2Result)).c_str(), 8, 0);							
+			send(FocusedClient->ClientSocket, p1Result.c_str(), 8, 0);
+			send(UnfocusedClient->ClientSocket, p2Result.c_str(), 8, 0);
 		}
 
 		void NotifyGameStart() 

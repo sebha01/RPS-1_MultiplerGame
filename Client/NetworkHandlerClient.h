@@ -78,7 +78,7 @@ class NetworkHandlerClient
 					cerr << "Server Lost, shutting down." << endl;
 					break;
 				}
-				else if ((bytesRecieved == 0)) 
+				else if ((bytesRecieved <= 0)) 
 				{
 					cerr << "Packet lost, shutting down." << endl;
 					break;
@@ -163,14 +163,14 @@ class NetworkHandlerClient
 
 		void SendCards() 
 		{
+			ZeroMemory(buff, 4096);
+
 			int c1, c2;
 			Game->TakeTurn(c1, c2);
 			int remove = Game->SelectFinalChoice(c1, c2);
 			int final = (remove == 1) ? c2 : c1;
 
 			string choiceStr = to_string(final);
-
-			// Send the player's choice to the server
 			send(Boss, (char*)&MOVE_PACKET, 1, 0);
 			send(Boss, choiceStr.c_str(), choiceStr.size() + 1, 0);
 
@@ -194,11 +194,12 @@ class NetworkHandlerClient
 			string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 			result = stoi(Tempstring);
 			Game->HandleWin(result);
-			this->~NetworkHandlerClient();
 		}
 
 		void HandleStart() 
 		{
+			ZeroMemory(buff, 4096);
+
 			int byteRecieved = recv(Boss, buff, 4096, 0);		//recieves players name
 			string Username = string(buff, 0, byteRecieved);	//Translates players name to string
 
