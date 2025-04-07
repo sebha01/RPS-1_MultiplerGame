@@ -126,7 +126,7 @@ class NetworkHandlerServer
 
 		void GameLoop() {		//The main loop of the class, handles all inputs
 			while (true) {
-				CheckSpectatorListenerSocket();
+				//CheckSpectatorListenerSocket();
 				ZeroMemory(buff, 4096);		//Unsure what this does but it feels important
 
 				//wait for client to send a packet header
@@ -235,7 +235,7 @@ class NetworkHandlerServer
 				result += 4;														//Increases game game result to show opponent moves
 				send(UnfocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
 
-				SendSpectatorsBoard(card1, card2, result);
+				//SendSpectatorsBoard(card1, card2, result);
 
 				SwapClientFocus();
 
@@ -298,85 +298,85 @@ class NetworkHandlerServer
 			//send(*FocusedSocket, (char*)&MOVE_PACKET, 1, 0);		//handled elsewhere now
 		}
 
-		void AddSpectator() {
-			if (NumOfSpectaors < 1)
-			{
-				//cout << "Looking for spectators" << endl;
-				SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);		//Like before, this listener socket recieves  requests to join the lobby. 
-																		//But now that the lobby is full, any new requests will be treated as spectators
+		//void AddSpectator() {
+		//	if (NumOfSpectaors < 1)
+		//	{
+		//		//cout << "Looking for spectators" << endl;
+		//		SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);		//Like before, this listener socket recieves  requests to join the lobby. 
+		//																//But now that the lobby is full, any new requests will be treated as spectators
 
-				unsigned long ul = 1;
+		//		unsigned long ul = 1;
 
 
 
-				//bind the IP
-				sockaddr_in hint;
-				hint.sin_family = AF_INET;
-				hint.sin_port = htons(port);					 //'htons' translates Big endian to Little endian		
-				hint.sin_addr.S_un.S_addr = INADDR_ANY;			 //Finds any available address to use
+		//		//bind the IP
+		//		sockaddr_in hint;
+		//		hint.sin_family = AF_INET;
+		//		hint.sin_port = htons(port);					 //'htons' translates Big endian to Little endian		
+		//		hint.sin_addr.S_un.S_addr = INADDR_ANY;			 //Finds any available address to use
 
-				sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
-				int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
+		//		sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
+		//		int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
 
-				//Binds listener to Ip and port defined by the hint
-				bind(listener, (sockaddr*)&hint, sizeof(hint));  //find function needs address of hint structure, cast to a socketaddress
+		//		//Binds listener to Ip and port defined by the hint
+		//		bind(listener, (sockaddr*)&hint, sizeof(hint));  //find function needs address of hint structure, cast to a socketaddress
 
-				cout <<ioctlsocket(listener, FIONBIO, (unsigned long*)&ul);		//Sets the listener socket to non blocking
-				//this listener socket needs to be non blocking so it doesnt wait for a spectator to join for the game to continue
-			
-				//Tells the listener socket to listen for clients attempting to join as spectators
+		//		cout <<ioctlsocket(listener, FIONBIO, (unsigned long*)&ul);		//Sets the listener socket to non blocking
+		//		//this listener socket needs to be non blocking so it doesnt wait for a spectator to join for the game to continue
+		//	
+		//		//Tells the listener socket to listen for clients attempting to join as spectators
 
-				listen(listener, SOMAXCONN);					 //allows the maximum amount of connections, and sets the listener port to listen
-				int tempResult = accept(listener, (sockaddr*)&client, &clientSize);
-			
-				if (tempResult != -1) {		//If temp result = -1, there is nobody waiting to join, so skip this
-					Spectators[NumOfSpectaors] = new CLIENT;	//Creates a new client in the spectator array to hold the spectator
-					Spectators[NumOfSpectaors]->ClientSocket = tempResult;	//binds the socket address to the newly made client
-					Spectators[NumOfSpectaors]->ClientName = ("Spectator" + NumOfSpectaors);		//sets the name of the spectator
-					cout << "New spectator has joined the lobby";		//logs the spectator joining
-					send(Spectators[NumOfSpectaors]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator packet	
-																										//Can get away with only sending the start of the spectator packet so the user is told its a spectator and changes accordingly
-					NumOfSpectaors++;
-				}
-				closesocket(listener);		//Closes the socket after each test
-			}
-		}
+		//		listen(listener, SOMAXCONN);					 //allows the maximum amount of connections, and sets the listener port to listen
+		//		int tempResult = accept(listener, (sockaddr*)&client, &clientSize);
+		//	
+		//		if (tempResult != -1) {		//If temp result = -1, there is nobody waiting to join, so skip this
+		//			Spectators[NumOfSpectaors] = new CLIENT;	//Creates a new client in the spectator array to hold the spectator
+		//			Spectators[NumOfSpectaors]->ClientSocket = tempResult;	//binds the socket address to the newly made client
+		//			Spectators[NumOfSpectaors]->ClientName = ("Spectator" + NumOfSpectaors);		//sets the name of the spectator
+		//			cout << "New spectator has joined the lobby";		//logs the spectator joining
+		//			send(Spectators[NumOfSpectaors]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator packet	
+		//																								//Can get away with only sending the start of the spectator packet so the user is told its a spectator and changes accordingly
+		//			NumOfSpectaors++;
+		//		}
+		//		closesocket(listener);		//Closes the socket after each test
+		//	}
+		//}
 
-		void CheckSpectatorListenerSocket() {
-			if (NumOfSpectaors < 4)
-			{
-				sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
-				int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
-				int tempResult = accept(listener, (sockaddr*)&client, &clientSize);
+		//void CheckSpectatorListenerSocket() {
+		//	if (NumOfSpectaors < 4)
+		//	{
+		//		sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
+		//		int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
+		//		int tempResult = accept(listener, (sockaddr*)&client, &clientSize);
 
-				if (tempResult != -1) {		//If temp result = -1, there is nobody waiting to join, so skip this
-					Spectators[NumOfSpectaors] = new CLIENT;	//Creates a new client in the spectator array to hold the spectator
-					Spectators[NumOfSpectaors]->ClientSocket = tempResult;	//binds the socket address to the newly made client
-					Spectators[NumOfSpectaors]->ClientName = ("Spectator" + NumOfSpectaors);		//sets the name of the spectator
-					cout << "New spectator has joined the lobby";		//logs the spectator joining
-					send(Spectators[NumOfSpectaors]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator packet	
-					//Can get away with only sending the start of the spectator packet so the user is told its a spectator and changes accordingly
-					NumOfSpectaors++;
-				}
-				if (NumOfSpectaors == 1) {closesocket(listener);}
-			}
+		//		if (tempResult != -1) {		//If temp result = -1, there is nobody waiting to join, so skip this
+		//			Spectators[NumOfSpectaors] = new CLIENT;	//Creates a new client in the spectator array to hold the spectator
+		//			Spectators[NumOfSpectaors]->ClientSocket = tempResult;	//binds the socket address to the newly made client
+		//			Spectators[NumOfSpectaors]->ClientName = ("Spectator" + NumOfSpectaors);		//sets the name of the spectator
+		//			cout << "New spectator has joined the lobby";		//logs the spectator joining
+		//			send(Spectators[NumOfSpectaors]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator packet	
+		//			//Can get away with only sending the start of the spectator packet so the user is told its a spectator and changes accordingly
+		//			NumOfSpectaors++;
+		//		}
+		//		if (NumOfSpectaors == 1) {closesocket(listener);}
+		//	}
 
-			//closesocket(listener);		//Closes the socket after each test
-		}
-		void SendSpectatorsBoard(int card1, int card2, int result) {
-			for (int i = 0; i < NumOfSpectaors; i++) {
-					char Map[16];													//Temporary container for sending the map
-				Game->SendMap(card1, card2, Map, true);
-				send(Spectators[i]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator_packet
+		//	//closesocket(listener);		//Closes the socket after each test
+		//}
+		//void SendSpectatorsBoard(int card1, int card2, int result) {
+		//	for (int i = 0; i < NumOfSpectaors; i++) {
+		//			char Map[16];													//Temporary container for sending the map
+		//		Game->SendMap(card1, card2, Map, true);
+		//		send(Spectators[i]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator_packet
 
-				send(Spectators[i]->ClientSocket, FocusedClient->ClientName.c_str(), FocusedClient->ClientName.size() + 1, 0);	//Sends the name of the player who made the move
+		//		send(Spectators[i]->ClientSocket, FocusedClient->ClientName.c_str(), FocusedClient->ClientName.size() + 1, 0);	//Sends the name of the player who made the move
 
-		
-				send(Spectators[i]->ClientSocket, (char*)&Map, 16, 0);								//sends Map
-				send(Spectators[i]->ClientSocket, (to_string(result)).c_str(), 8, 0);			//Sends game result
-			
+		//
+		//		send(Spectators[i]->ClientSocket, (char*)&Map, 16, 0);								//sends Map
+		//		send(Spectators[i]->ClientSocket, (to_string(result)).c_str(), 8, 0);			//Sends game result
+		//	
 
-			}
-		}
+		//	}
+		//}
 };
 

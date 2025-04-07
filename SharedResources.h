@@ -25,3 +25,28 @@ struct CLIENT
 	string ClientName;
 	int points = 0;
 };
+
+#define MIN_CHOICE 1
+#define MAX_CHOICE 3
+
+enum Choice
+{
+	ROCK = 1,
+	PAPER = 2,
+	SCISSORS = 3
+};
+
+string ChoiceToString(Choice c)
+{
+	switch (c)
+	{
+		case ROCK:
+			return "Rock";
+		case PAPER:
+			return "Paper";
+		case SCISSORS:
+			return "Scissors";
+		default:
+			return "";
+	}
+}
