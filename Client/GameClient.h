@@ -34,14 +34,16 @@ class ClientGame
 			cout << "2: When it is your turn, enter your choice of 1-3 to choose from Rock, Paper or Scissors" << endl;
 			cout << "3: You will do this twice so that you have two choices, from there you must choose to remove one of your choices." << endl;
 			cout << "4: You will then have your final choice used against your opponents final choice to decide the winner." << endl;
-			cout << "5: The game concludes when one player wins or loses, until then you will continue to play rounds if you draw against each other." << endl << endl;
+			cout << "5: The game concludes when one player wins or loses, until then you will continue to play rounds if you draw against each other." << endl;
 			cout << "6: The loser will be shot and the opposing player will be allowed to live, best of luck :)." << endl;
 			cout << (" Please wait until the lobby is full") << endl;
 
 		}
 
-		int validateInput(int choice, int minChoice, int maxChoice)
+		int validateInput(int minChoice, int maxChoice)
 		{
+			int choice = 0;
+
 			//got this validation from my pokemon game year 1 assignment, if you need me to show you ask me
 			while (!(cin >> choice) || (choice < minChoice || choice > maxChoice))
 			{
@@ -55,154 +57,44 @@ class ClientGame
 			return choice;
 		}
 
-		void TakeTurn(int& choice1, int& choice2) 
+		void TakeTurn(int& finalChoice) 
 		{
-			//bool valid = false;
-
-			//while (valid == false) 
-			//{
-			//	cin.clear();
-			//	card1 = 0;
-			//	card2 = 0;
-			//	string Scard1;
-			//	string Scard2;
-
-			//	while (valid == false) 
-			//	{
-			//		try
-			//		{
-			//			cout << (" Please enter Card 1 : ");	//Enter the location of your first card
-			//			getline(cin, Scard1);			//Displays your first card
-			//			cout << endl << (" Please enter Card 2 : ");	//Enter the location of your next card
-			//			getline(cin, Scard2);		//Displays your second card
-			//			card1 = stoi(Scard1);
-			//			card2 = stoi(Scard2);
-
-			//			valid = true;
-
-			//		}
-			//		catch (const exception&)
-			//		{
-			//			cout << "Invalid input, please try again:" << endl << endl;
-			//		}
-			//	}
-
-			//	valid = false;
-			//	card1 = CalculateCard(card1);
-			//	card2 = CalculateCard(card2);
-
-			//	if ((card1 == -1) or (card2 == -1)) 
-			//	{
-			//		cout << "Invalid input, please try again:" << endl << endl;
-			//		cin.clear();
-			//	}
-			//	else 
-			//	{ 
-			//		valid = true; 
-			//	}
-			//}
-
 			cout << "Please make two choices between Rock Paper and Scissors, enter a number between 1 and 3, anything else will not be accepted -> ";
+			cout << "1: Rock" << endl;
+			cout << "2: Paper" << endl;
+			cout << "3: Scissors" << endl;
 
-			choice1 = validateInput(choice1, MIN_CHOICE, MAX_CHOICE);
-			choice2 = validateInput(choice2, MIN_CHOICE, MAX_CHOICE);
+			//Get first choice
+			cout << endl << "Your first choice -> ";
+			int choice1 = validateInput( MIN_CHOICE, MAX_CHOICE);
+			
+			//Get second choiceSD
+			cout << endl << "Your second choice -> ";
+			int choice2 = validateInput( MIN_CHOICE, MAX_CHOICE);
 
 			cout << "Now pick between your first and second choice to remove to decide your final choice ->" << endl;
 			cout << "1: " << ChoiceToString(static_cast<Choice>(choice1)) << endl;
 			cout << "2: " << ChoiceToString(static_cast<Choice>(choice2)) << endl;
 			cout << "Decide wisely... For it could be your last :D  -> ";
 
-			finalChoice = validateInput(finalChoice, 1, 2);
+			finalChoice = validateInput( 1, 2);
 		}
 
-		int CalculateCard(int card) 
+		void HandleResult(int Turnresult)
 		{
-			int part1 = (card / 10);
-			int part2 = (card % 10);
-			int returnval = 0;
-
-			if ((part1 < 0) or (part1 > 4) or (part2 < 0) or (part2 > 4)) 
+			// Example of what the Turnresult could represent
+			if (Turnresult == 4)  // 4 means player wins
 			{
-				returnval = -1;
+				cout << "You win! Congratulations!" << endl;
 			}
-			else 
+			else if (Turnresult == 8)  // 8 means opponent wins
 			{
-				returnval = ((part1 - 1) * 4) + (part2 - 1);
+				cout << "You lost! Better luck next time." << endl;
 			}
-			if ((returnval < 0) or (returnval > 15)) 
+			else
 			{
-				returnval = -1;
+				cout << "Draw!" << endl;
 			}
-			return returnval;
-		}
-
-		int RecieveResult(int turnresult, char Localgrid[17]) 
-		{
-			switch (turnresult) {		//If the player made an incorrect input, try again (This could probably be handled entirely by the player)
-			case 1:
-				cout << "You have already looked in one of these spaces." << endl;
-				break;
-			case 2:
-				cout << "A MATCH!! NICE" << endl;
-				//points += 1;
-				break;
-			case 3:
-				cout << "You got nothing." << endl;
-				break;
-			case 4:
-				cout << "All matches found" << endl;
-				break;
-			case 5:
-			case 7:
-				cout << opponentName << "  got nothing" << endl;
-				break;
-			case 6:
-				cout << opponentName << "  got a match!" << endl;
-				break;
-			case 8:
-				cout << opponentName << "  found the last match." << endl;
-				break;
-			}
-			//cout << "Turn result: " << turnresult << endl;
-
-			//PrintBoard(Localgrid);
-
-			return 0;
-		}
-
-		//void PrintBoard(char Localgrid[16]) 
-		//{
-		//	int counter = 0;
-		//	for (int x = 0; x < 16; x++)
-		//	{
-		//		counter++;
-		//		cout << "|  " << Localgrid[x];	//The grid is shown using this command for testing purposes only must be removed prior to playing
-
-		//		if (counter == 4)
-		//		{
-		//			cout << "|  " << ("\n");
-		//			counter = 0;
-		//		}
-
-		//	}
-		//}
-
-		void HandleWin(int win) 
-		{
-			if (win == 0) 
-			{
-				cout << "It's a draw. You will now play another round..." << endl;
-
-			}
-			else if (win == 1) 
-			{
-				cout << "You win! " << opponentName << " will now die... :(" << endl;
-			}
-			else if (win == 2)
-			{
-				cout << opponentName << " won! Unlucky, I guess now you will now die... :(" << endl;
-			}
-			cout << "BANG! :(" << endl;
 		}
 
 		void GameStarting(string inOpponent)  

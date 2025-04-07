@@ -175,30 +175,33 @@ class NetworkHandlerClient
 			}
 		}
 
-		void ReadGameResults() 
+		void ReadGameResults()
 		{
-			int Turnresult;		//Holds the result of the turn to be passed into the game client
-			char Board[16];		//Holds the board temporarily to be passed into the game client
-			int temp;			//temporary holder
-			int byteRecieved;	//Messages are sent as integers, so this holds that infomation to be translated
+			int Turnresult;         // Holds the result of the turn to be passed into the game client
+			int byteRecieved;       // Used to store the number of bytes received
 
-			//Board result!!
-			byteRecieved = recv(Boss, buff, 16, 0);						//Recieves the second game result, the updated board.
-			string Tempstring = string(buff, 0, byteRecieved);				//Translates the result into a plaintext string
-			translateString(Board, Tempstring);								//Translates the result into a string using the custom Translate string function
+			// Recieve the game result (player's turn result)
+			byteRecieved = recv(Boss, buff, 8, 0);   // Receives the game result (e.g., win/loss status)
+			if (byteRecieved == SOCKET_ERROR || byteRecieved == 0)
+			{
+				cerr << "Error receiving game result" << endl;
+				return;
+			}
 
-			//Game result!!
-			byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the first Game result, the game result.
-			Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
-			Turnresult = stoi(Tempstring);									//Translates the result into an integer
-			//cout << "Game result: " << Turnresult << endl;
+			// Convert the received data to a string and then to an integer
+			string Tempstring = string(buff, 0, byteRecieved);
+			Turnresult = stoi(Tempstring);
 
-			temp = Game->RecieveResult(Turnresult, Board);					//Passes the board and game result into the gameclient
-			if (Turnresult == 4 or Turnresult == 8) {						//4 is a player win, 8 is a opponent win
-																			//Do more here to handle a win result
-				this->~NetworkHandlerClient();
+			// Handle the game result in the game client
+			Game->HandleResult(Turnresult);  // Pass the result directly to the game client to handle the win/loss
+
+			// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
+			if (Turnresult == 4 || Turnresult == 8)
+			{
+				this->~NetworkHandlerClient();  // Close the connection after a win/loss
 			}
 		}
+
 
 		void translateString(char outboard[16], string instring) 
 		{	//Used to convert string into a board
@@ -210,21 +213,16 @@ class NetworkHandlerClient
 
 		void SendChoices() 
 		{
-			int choice1;  //temporary cards comtainer to be passed as reference
-			int choice2;
+			int finalChoice;  //temporary cards comtainer to be passed as reference
 		
-			Game->TakeTurn(choice1, choice2);	//Passes the cards as references
+			Game->TakeTurn(finalChoice);	//Passes the cards as references
 
-			string Schoice1 = (to_string(choice1));		//Translates the cards into strings to be sent
-			string Schoice2 = (to_string(choice2));
+			string SfinalChoice = (to_string(finalChoice));		//Translates the cards into strings to be sent
 
 			//Sends input packet
 			send(Boss, (char*)&INPUT_PACKET, 1, 0);		
 			//cout << "sending card1: " << Scard1 << endl;
-			send(Boss, Schoice1.c_str(), sizeof(Schoice1.c_str() + 1), 0);
-			//cout << "sending card2: " << Scard2 << endl;
-			send(Boss, Schoice2.c_str(), sizeof(Schoice2.c_str() + 1), 0);
-
+			send(Boss, SfinalChoice.c_str(), sizeof(SfinalChoice.c_str() + 1), 0);
 		}
 
 		void SendHello() {
@@ -243,7 +241,7 @@ class NetworkHandlerClient
 			string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 
 			result = stoi(Tempstring);
-			Game->HandleWin(result);
+			Game->HandleResult(result);
 
 			this->~NetworkHandlerClient();
 		}
