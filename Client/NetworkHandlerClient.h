@@ -30,6 +30,7 @@ class NetworkHandlerClient
 				this->~NetworkHandlerClient();
 				return;
 			}
+
 			//createsocket
 			Boss = socket(AF_INET, SOCK_STREAM, 0);		//Boss is the server
 
@@ -73,37 +74,37 @@ class NetworkHandlerClient
 			WSACleanup();
 		}
 
-		//Old function, ignore
-		void InputLoop() 
-		{  //depricated
-			string userInput;
+		////Old function, ignore
+		//void InputLoop() 
+		//{  //depricated
+		//	string userInput;
 
-			do 
-			{
-				//cout << "input please" << endl;
-				getline(cin, userInput);	//ask for input
+		//	do 
+		//	{
+		//		//cout << "input please" << endl;
+		//		getline(cin, userInput);	//ask for input
 
-				if (userInput.size() > 0) 
-				{
-					int sendResult = send(Boss, userInput.c_str(), userInput.size() + 1, 0);
-					if (sendResult != SOCKET_ERROR) 
-					{
-						ZeroMemory(buff, 4096);
-						int bytesRecieved = recv(Boss, buff, 4096, 0);
+		//		if (userInput.size() > 0) 
+		//		{
+		//			int sendResult = send(Boss, userInput.c_str(), userInput.size() + 1, 0);
+		//			if (sendResult != SOCKET_ERROR) 
+		//			{
+		//				ZeroMemory(buff, 4096);
+		//				int bytesRecieved = recv(Boss, buff, 4096, 0);
 
-						if (bytesRecieved > 0) 
-						{
-							cout << "Server says: " << string(buff, 0, bytesRecieved) << endl;
-						}
-					}
-				}
+		//				if (bytesRecieved > 0) 
+		//				{
+		//					cout << "Server says: " << string(buff, 0, bytesRecieved) << endl;
+		//				}
+		//			}
+		//		}
 
-			} while (userInput.size() > 0);
-			//close everything
-			//closesocket(Boss);
-			//WSACleanup();
-		}  //depricated
-		//End of old functions, pay attention again
+		//	} while (userInput.size() > 0);
+		//	//close everything
+		//	//closesocket(Boss);
+		//	//WSACleanup();
+		//}  //depricated
+		////End of old functions, pay attention again
 
 		void GameLoop() 
 		{
