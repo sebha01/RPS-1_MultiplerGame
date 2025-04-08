@@ -213,65 +213,136 @@ class NetworkHandlerServer
 
 		void RecievePlayerCards() 
 		{
+			////Input handling
+			//int byteRecieved = recv(FocusedClient->ClientSocket, buff, 8, 0);			//Recieves the first card as an integer
+			//string SCard1 = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
+			//int card1 = stoi(SCard1);										//Translates the string into a card
+
+			//Temp code 
+			//-----------------#
+			
 			//Input handling
 			int byteRecieved = recv(FocusedClient->ClientSocket, buff, 8, 0);			//Recieves the first card as an integer
-			string SCard1 = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
-			int card1 = stoi(SCard1);										//Translates the string into a card
+			string choice = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
+			int ch = stoi(choice);										//Translates the string into a card
 
-			byteRecieved = recv(FocusedClient->ClientSocket, buff, 8, 0);				//Recieves the second card as an integer
-			string SCard2 = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
-			int card2 = stoi(SCard2);										//Translates the string into a card
+			cout << endl << byteRecieved << endl << ch << endl << choice << endl << endl;
 
-			//cout << "Recieved card1: " << card1 << endl;
-			//cout << "Recieved card2: " << card2 << endl;
-
-			//Output handling
-			int result = Game->calculateresult(card1, card2);				//Uses the game server to calculate the result of the move
-			char Map[16];													//Temporary container for sending the map
-			Game->SendMap(card1, card2, Map, true);							//Recieves the map from the server, updating the map variable
-
-			//Sends to the player that made the move
-			if (result == 4) 
+			if (Game->getp1Decided() == false && Game->getp2Decided() == false)
+			{
+				Game->setPlayer1Choice(ch);
+				SwapClientFocus();
+				send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+			}
+			else if (Game->getp1Decided() == true && Game->getp2Decided() == false)
+			{
+				Game->setPlayer2Choice(ch);
+				//SwapClientFocus();
+				//send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+				HandleWin();
+				//return;
+			}
+			else if (Game->getp1Decided() == true && Game->getp2Decided() == true)
 			{
 				HandleWin();
+				//return;
 			}
-			else 
-			{
-				////cout << "Sending Results packet!" << endl;
-				//send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);					//Send the start of a result packet
-				//send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);							//sends Map
-				//send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);		//sends game result
-				//if (result == 2)
-				//{
-				//	FocusedClient->points++;
-				//}
-				////Sends to the other player
-				//Game->SendMap(card1, card2, Map, false);							//Needs to recalculate the map to not show the opponent the cards
-				//send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
-				//send(UnfocusedClient->ClientSocket, (char*)&Map, 16, 0);
-				//result += 4;														//Increases game game result to show opponent moves
-				//send(UnfocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
 
-				////SendSpectatorsBoard(card1, card2, result);
 
-				// If it's not a win, send the result back to clients
-				send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
-				send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);
-				send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
-				// Send to the other player as well
-				Game->SendMap(card1, card2, Map, false);
-				send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
-				send(UnfocusedClient->ClientSocket, (char*)&Map, 16, 0);
-				send(UnfocusedClient->ClientSocket, (to_string(result + 4)).c_str(), 8, 0);
+						//Called AFTER swapping clients
 
-				SwapClientFocus();
+			//------------------
 
-				send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);			//Called AFTER swapping clients
-			}
+			//byteRecieved = recv(FocusedClient->ClientSocket, buff, 8, 0);				//Recieves the second card as an integer
+			//string SCard2 = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
+			//int card2 = stoi(SCard2);										//Translates the string into a card
+
+			//cout << "Recieved card1: " << card1 << endl;
+			////cout << "Recieved card2: " << card2 << endl;
+
+			////Output handling
+			//int result = Game->calculateresult(card1, card2);				//Uses the game server to calculate the result of the move
+			//char Map[16];													//Temporary container for sending the map
+			//Game->SendMap(card1, card2, Map, true);							//Recieves the map from the server, updating the map variable
+
+			////Sends to the player that made the move
+			//if (result == 4) 
+			//{
+			//	HandleWin();
+			//}
+			//else 
+			//{
+			//	////cout << "Sending Results packet!" << endl;
+			//	//send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);					//Send the start of a result packet
+			//	//send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);							//sends Map
+			//	//send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);		//sends game result
+			//	//if (result == 2)
+			//	//{
+			//	//	FocusedClient->points++;
+			//	//}
+			//	////Sends to the other player
+			//	//Game->SendMap(card1, card2, Map, false);							//Needs to recalculate the map to not show the opponent the cards
+			//	//send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+			//	//send(UnfocusedClient->ClientSocket, (char*)&Map, 16, 0);
+			//	//result += 4;														//Increases game game result to show opponent moves
+			//	//send(UnfocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
+
+			//	////SendSpectatorsBoard(card1, card2, result);
+
+			//	// If it's not a win, send the result back to clients
+			//	send(FocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+			//	send(FocusedClient->ClientSocket, (char*)&Map, 16, 0);
+			//	send(FocusedClient->ClientSocket, (to_string(result)).c_str(), 8, 0);
+			//	// Send to the other player as well
+			//	Game->SendMap(card1, card2, Map, false);
+			//	send(UnfocusedClient->ClientSocket, (char*)&RESULT_PACKET, 1, 0);
+			//	send(UnfocusedClient->ClientSocket, (char*)&Map, 16, 0);
+			//	send(UnfocusedClient->ClientSocket, (to_string(result + 4)).c_str(), 8, 0);
+
+			//	SwapClientFocus();
+
+			//	send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);			//Called AFTER swapping clients
+			//}
 		}
 
 		void HandleWin() 
 		{
+
+			//--
+			// HANDLE WIN IMPORTANT TO PROGRESS
+			//--
+			int player1Result = 0;
+			int player2Result = 0;
+
+			if (Game->getP1Choice() == Game->getP2Choice())
+			{
+				player1Result = 0;
+				player2Result = 0;
+			}
+			else if (
+				(Game->getP1Choice() == ROCK && Game->getP2Choice() == SCISSORS) ||
+				(Game->getP1Choice() == PAPER && Game->getP2Choice() == ROCK) ||
+				(Game->getP1Choice() == SCISSORS && Game->getP2Choice() == PAPER)
+				)
+			{
+				player1Result = 1;
+				player2Result = 2;
+			}
+			else
+			{
+				player1Result = 2;
+				player2Result = 1;
+			}
+
+			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
+			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
+			ZeroMemory(buff, 4096);
+			/*send(FocusedClient->ClientSocket, to_string(player1Result).c_str(), 8, 0);
+			send(UnfocusedClient->ClientSocket, to_string(player2Result).c_str(), 8, 0);*/
+			send(FocusedClient->ClientSocket, (char*)&player1Result, sizeof(int), 0);
+			send(UnfocusedClient->ClientSocket, (char*)&player2Result, sizeof(int), 0);
+
+
 			//int player1Result = 1;
 			//int player2Result = 0;
 
@@ -298,14 +369,14 @@ class NetworkHandlerServer
 			//send(FocusedClient->ClientSocket, (to_string(player1Result)).c_str(), 8, 0);							
 			//send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);		
 			 
-			int player1Result = (FocusedClient->points > UnfocusedClient->points) ? 1 : 0;
+			/*int player1Result = (FocusedClient->points > UnfocusedClient->points) ? 1 : 0;
 			int player2Result = (FocusedClient->points < UnfocusedClient->points) ? 1 : 0;
 
 			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			ZeroMemory(buff, 4096);
 			send(FocusedClient->ClientSocket, (to_string(player1Result)).c_str(), 8, 0);
-			send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);
+			send(UnfocusedClient->ClientSocket, (to_string(player2Result)).c_str(), 8, 0);*/
 		}
 
 		void NotifyGameStart() 
@@ -341,86 +412,5 @@ class NetworkHandlerServer
 
 			//send(*FocusedSocket, (char*)&MOVE_PACKET, 1, 0);		//handled elsewhere now
 		}
-
-		//void AddSpectator() {
-		//	if (NumOfSpectaors < 1)
-		//	{
-		//		//cout << "Looking for spectators" << endl;
-		//		SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);		//Like before, this listener socket recieves  requests to join the lobby. 
-		//																//But now that the lobby is full, any new requests will be treated as spectators
-
-		//		unsigned long ul = 1;
-
-
-
-		//		//bind the IP
-		//		sockaddr_in hint;
-		//		hint.sin_family = AF_INET;
-		//		hint.sin_port = htons(port);					 //'htons' translates Big endian to Little endian		
-		//		hint.sin_addr.S_un.S_addr = INADDR_ANY;			 //Finds any available address to use
-
-		//		sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
-		//		int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
-
-		//		//Binds listener to Ip and port defined by the hint
-		//		bind(listener, (sockaddr*)&hint, sizeof(hint));  //find function needs address of hint structure, cast to a socketaddress
-
-		//		cout <<ioctlsocket(listener, FIONBIO, (unsigned long*)&ul);		//Sets the listener socket to non blocking
-		//		//this listener socket needs to be non blocking so it doesnt wait for a spectator to join for the game to continue
-		//	
-		//		//Tells the listener socket to listen for clients attempting to join as spectators
-
-		//		listen(listener, SOMAXCONN);					 //allows the maximum amount of connections, and sets the listener port to listen
-		//		int tempResult = accept(listener, (sockaddr*)&client, &clientSize);
-		//	
-		//		if (tempResult != -1) {		//If temp result = -1, there is nobody waiting to join, so skip this
-		//			Spectators[NumOfSpectaors] = new CLIENT;	//Creates a new client in the spectator array to hold the spectator
-		//			Spectators[NumOfSpectaors]->ClientSocket = tempResult;	//binds the socket address to the newly made client
-		//			Spectators[NumOfSpectaors]->ClientName = ("Spectator" + NumOfSpectaors);		//sets the name of the spectator
-		//			cout << "New spectator has joined the lobby";		//logs the spectator joining
-		//			send(Spectators[NumOfSpectaors]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator packet	
-		//																								//Can get away with only sending the start of the spectator packet so the user is told its a spectator and changes accordingly
-		//			NumOfSpectaors++;
-		//		}
-		//		closesocket(listener);		//Closes the socket after each test
-		//	}
-		//}
-
-		//void CheckSpectatorListenerSocket() {
-		//	if (NumOfSpectaors < 4)
-		//	{
-		//		sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
-		//		int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
-		//		int tempResult = accept(listener, (sockaddr*)&client, &clientSize);
-
-		//		if (tempResult != -1) {		//If temp result = -1, there is nobody waiting to join, so skip this
-		//			Spectators[NumOfSpectaors] = new CLIENT;	//Creates a new client in the spectator array to hold the spectator
-		//			Spectators[NumOfSpectaors]->ClientSocket = tempResult;	//binds the socket address to the newly made client
-		//			Spectators[NumOfSpectaors]->ClientName = ("Spectator" + NumOfSpectaors);		//sets the name of the spectator
-		//			cout << "New spectator has joined the lobby";		//logs the spectator joining
-		//			send(Spectators[NumOfSpectaors]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator packet	
-		//			//Can get away with only sending the start of the spectator packet so the user is told its a spectator and changes accordingly
-		//			NumOfSpectaors++;
-		//		}
-		//		if (NumOfSpectaors == 1) {closesocket(listener);}
-		//	}
-
-		//	//closesocket(listener);		//Closes the socket after each test
-		//}
-		//void SendSpectatorsBoard(int card1, int card2, int result) {
-		//	for (int i = 0; i < NumOfSpectaors; i++) {
-		//			char Map[16];													//Temporary container for sending the map
-		//		Game->SendMap(card1, card2, Map, true);
-		//		send(Spectators[i]->ClientSocket, (char*)&SPECTATOR_PACKET, 1, 0);					//Send the start of a spectator_packet
-
-		//		send(Spectators[i]->ClientSocket, FocusedClient->ClientName.c_str(), FocusedClient->ClientName.size() + 1, 0);	//Sends the name of the player who made the move
-
-		//
-		//		send(Spectators[i]->ClientSocket, (char*)&Map, 16, 0);								//sends Map
-		//		send(Spectators[i]->ClientSocket, (to_string(result)).c_str(), 8, 0);			//Sends game result
-		//	
-
-		//	}
-		//}
 };
 

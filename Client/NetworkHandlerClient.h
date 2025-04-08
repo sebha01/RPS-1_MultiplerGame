@@ -68,31 +68,6 @@ class NetworkHandlerClient
 			WSACleanup();
 		}
 
-		////Old function, ignore
-		//void InputLoop() 
-		//{  //depricated
-		//	string userInput;
-		//	do {
-		//		//cout << "input please" << endl;
-		//		getline(cin, userInput);	//ask for input
-		//		if (userInput.size() > 0) {
-		//			int sendResult = send(Boss, userInput.c_str(), userInput.size() + 1, 0);
-		//			if (sendResult != SOCKET_ERROR) {
-		//				ZeroMemory(buff, 4096);
-		//				int bytesRecieved = recv(Boss, buff, 4096, 0);
-		//				if (bytesRecieved > 0) {
-		//					cout << "Server says: " << string(buff, 0, bytesRecieved) << endl;
-		//				}
-		//			}
-		//		}
-
-		//	} while (userInput.size() > 0);
-		//	//close everything
-		//	//closesocket(Boss);
-		//	//WSACleanup();
-		//}  //depricated
-		////End of old functions, pay attention again
-
 		void GameLoop() 
 		{
 			SendHello();	//Straight after a successful connection, try to send a Hello packet to the sever
@@ -198,18 +173,10 @@ class NetworkHandlerClient
 			// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
 			if (Turnresult == 4 || Turnresult == 8)
 			{
+				cout << "Closing the network via destructor" << endl;
 				this->~NetworkHandlerClient();  // Close the connection after a win/loss
 			}
 		}
-
-
-		//void translateString(char outboard[16], string instring) 
-		//{	//Used to convert string into a board
-		//	for (int i = 0; i < 16; i++) {
-		//		outboard[i] = instring[i];
-		//	}
-		//	//cout << "Test" << endl;
-		//}
 
 		void SendChoices() 
 		{
@@ -234,13 +201,14 @@ class NetworkHandlerClient
 		void HandleConclusionPacket() 
 		{
 			int byteRecieved;
-			char result;
+			int result = 0;
 			ZeroMemory(buff, 4096);
 
-			byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the second game result, the updated board.
-			string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
+			//byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the second game result, the updated board.
+			//string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 
-			result = stoi(Tempstring);
+			//result = stoi(Tempstring);
+			recv(Boss, (char*)&result, sizeof(int), 0);
 			Game->HandleResult(result);
 
 			this->~NetworkHandlerClient();

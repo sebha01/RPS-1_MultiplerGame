@@ -78,22 +78,28 @@ class ClientGame
 			cout << "Decide wisely... For it could be your last :D  -> ";
 
 			finalChoice = validateInput( 1, 2);
+
+			cout << "Waiting for other player to decide... " << endl;
 		}
 
 		void HandleResult(int Turnresult)
 		{
 			// Example of what the Turnresult could represent
-			if (Turnresult == 4)  // 4 means player wins
+			if (Turnresult == 1) 
 			{
 				cout << "You win! Congratulations!" << endl;
 			}
-			else if (Turnresult == 8)  // 8 means opponent wins
+			else if (Turnresult == 2)
 			{
 				cout << "You lost! Better luck next time." << endl;
 			}
-			else
+			else if (Turnresult == 0)
 			{
 				cout << "Draw!" << endl;
+			}
+			else
+			{
+				cout << "Unexpected error" << Turnresult << endl <<endl;
 			}
 		}
 
