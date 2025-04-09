@@ -120,9 +120,6 @@ class NetworkHandlerClient
 			}
 			else if (packetType[0] == PROMPT_PACKET) 
 			{
-				system("CLS");
-				Game->ShowTitle();
-				SendChoices();
 				//Doesnt work for some reason, replaced with MOVE_PACKET \/
 			}
 			else if (packetType[0] == MOVE_PACKET) 
@@ -139,6 +136,13 @@ class NetworkHandlerClient
 			else if (packetType[0] == CONCLUSION_PACKET) 
 			{
 				HandleConclusionPacket();
+			}
+			else if (packetType[0] == ROUND_RESTART_PACKET)
+			{
+				system("CLS");
+				Game->ShowTitle();
+				cout << "Restarting round..." << endl;
+				SendChoices();
 			}
 			else 
 			{
