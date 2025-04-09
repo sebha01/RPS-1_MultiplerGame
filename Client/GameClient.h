@@ -12,13 +12,19 @@ class ClientGame
 	public:
 		ClientGame() 
 		{
-
-			//char player1[30] = "lalala";				//this sets the variable for name entry
-			//srand(time(NULL));							//this command is only required at the start and sets the clock
+			ShowTitle();
 
 			cout << ("Please enter your name? - ");  //this command is used to store the players name for us later on within the game
 			//cin >> playerName;
 			getline(cin, playerName);
+			cout << endl;
+		}
+
+		void ShowTitle()
+		{
+			cout << "------------------------------------------------------------------------------------------------------------------------" << endl;
+			cout << setw(80) << "-- -- ROCK PAPER SCISSORS MINUS ONE -- --" << endl;
+			cout << "------------------------------------------------------------------------------------------------------------------------" << endl;
 			cout << endl;
 		}
 
@@ -122,6 +128,7 @@ class ClientGame
 		{
 			system("CLS");
 			opponentName = inOpponent;
+			ShowTitle();
 			cout << "You have been matched against " << inOpponent << "." << endl << "Game is starting..." << endl;
 		}
 
