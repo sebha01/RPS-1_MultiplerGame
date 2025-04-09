@@ -222,6 +222,7 @@ class NetworkHandlerServer
 			else if (Game->getp1Decided() == true && Game->getp2Decided() == false)
 			{
 				Game->setPlayer2Choice(ch);
+				SwapClientFocus();
 				HandleWin();
 			}
 			else if (Game->getp1Decided() == true && Game->getp2Decided() == true)
@@ -244,9 +245,6 @@ class NetworkHandlerServer
 
 			if (Game->getP1Choice() == Game->getP2Choice())
 			{
-				player1Result = 0;
-				player2Result = 0;
-
 				cout << "Restarting round..." << endl;
 
 				send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
@@ -277,9 +275,15 @@ class NetworkHandlerServer
 				send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			}
 
+			
+
 			ZeroMemory(buff, 4096);
-			send(FocusedClient->ClientSocket, (char*)&player1Result, sizeof(int), 0);
-			send(UnfocusedClient->ClientSocket, (char*)&player2Result, sizeof(int), 0);
+
+			string p1Result = to_string(player1Result);
+			send(FocusedClient->ClientSocket, p1Result.c_str(), sizeof(p1Result).c_str(), 0);
+
+			string p2Result = to_string(player2Result);
+			send(UnfocusedClient->ClientSocket, p2Result.c_str(), sizeof(p2Result).c_str(), 0);
 
 			cout << "End of Handle Win Function" << endl;
 		}

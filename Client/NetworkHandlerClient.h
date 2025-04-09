@@ -197,20 +197,20 @@ class NetworkHandlerClient
 
 		void HandleConclusionPacket() 
 		{
-			//int byteRecieved;
-			//int result = 0;
+			int byteRecieved;
+			int result = 0;
 			ZeroMemory(buff, 4096);
 
-			//byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the second game result, the updated board.
-			//string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
+			byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the second game result, the updated board.
+			string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 
-			//result = stoi(Tempstring);
+			result = stoi(Tempstring);
 			
 			//result = recv(Boss, buff, 4096, 0);
 			
-			//cout << result << " This is at HandleConclusionPacket" << endl;
+			cout << result << " This is at HandleConclusionPacket" << endl;
 			
-			//Game->HandleResult(result);
+			Game->HandleResult(result);
 
 			SendByeMessage();
 			this->~NetworkHandlerClient();
