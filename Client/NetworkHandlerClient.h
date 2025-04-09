@@ -15,6 +15,9 @@ class NetworkHandlerClient
 	public:
 		NetworkHandlerClient(string Ip, int port) 
 		{
+			//Set Console colours
+			system("color C0");
+
 			Game = new ClientGame();  //Create client game
 			//initialise winsock
 			WSADATA wsData;
@@ -146,7 +149,6 @@ class NetworkHandlerClient
 
 		void ReadGameResults()
 		{
-			cout << "Entered Read Game Results function" << endl;
 			int Turnresult;         // Holds the result of the turn to be passed into the game client
 			int byteRecieved;       // Used to store the number of bytes received
 
@@ -163,7 +165,7 @@ class NetworkHandlerClient
 			Turnresult = stoi(Tempstring);
 
 			// Handle the game result in the game client
-			//Game->HandleResult(Turnresult);  // Pass the result directly to the game client to handle the win/loss
+			Game->HandleResult(Turnresult);  // Pass the result directly to the game client to handle the win/loss
 
 			// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
 			if (Turnresult == 4 || Turnresult == 8)
@@ -172,8 +174,6 @@ class NetworkHandlerClient
 				SendByeMessage();
 				this->~NetworkHandlerClient();  // Close the connection after a win/loss
 			}
-
-			cout << "End of Read Game Results function" << endl;
 		}
 
 		void SendChoices() 
@@ -206,10 +206,6 @@ class NetworkHandlerClient
 
 			result = stoi(Tempstring);
 			
-			//result = recv(Boss, buff, 4096, 0);
-			
-			cout << result << " This is at HandleConclusionPacket" << endl;
-			
 			Game->HandleResult(result);
 
 			SendByeMessage();
@@ -226,7 +222,7 @@ class NetworkHandlerClient
 
 		void SendByeMessage()
 		{
-			cout << "Connection terminated." << endl;
+			cout << endl << "Connection terminated." << endl;
 			cout << "Disconnecting..." << endl;
 			Sleep(500000);
 		}

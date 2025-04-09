@@ -11,6 +11,16 @@ class GameServer
 		bool p1Decided = false;
 		bool p2Decided = false;
 	public:
+		GameServer() {}
+
+		void ResetRound()
+		{
+			// Reset player choices and decision flags
+			playerOneChoice = 0;
+			playerTwoChoice = 0;
+			p1Decided = false;
+			p2Decided = false;
+		}
 
 		void setPlayer1Choice(int c)
 		{
@@ -42,17 +52,6 @@ class GameServer
 		int getP2Choice()
 		{
 			return playerTwoChoice;
-		}
-
-		GameServer() {}
-
-		void ResetRound()
-		{
-			// Reset player choices and decision flags
-			playerOneChoice = 0;
-			playerTwoChoice = 0;
-			p1Decided = false;
-			p2Decided = false;
 		}
 };
 

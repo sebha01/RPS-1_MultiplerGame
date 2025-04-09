@@ -6,9 +6,6 @@
 class NetworkHandlerServer
 {
 	private:
-
-		//SOCKET *FocusedSocket;
-		//SOCKET *UnfocusedSocket;
 		CLIENT* FocusedClient;
 		CLIENT* UnfocusedClient;
 		GameServer* Game = nullptr;
@@ -91,7 +88,6 @@ class NetworkHandlerServer
 				}
 
 				socketCount += 1;
-
 			}
 
 			unsigned long ul = 1;
@@ -233,22 +229,18 @@ class NetworkHandlerServer
 
 		void HandleWin() 
 		{
-			cout << "Start of handle win function" << endl;
-			//--
-			// HANDLE WIN IMPORTANT TO PROGRESS
-			//--
 			int player1Result = 0;
 			int player2Result = 0;
 
-			cout << "Player One Choice -> " << ChoiceToString(static_cast<Choice>(Game->getP1Choice())) << endl;
-			cout << "Player Two Choice -> " << ChoiceToString(static_cast<Choice>(Game->getP2Choice())) << endl;
-
 			if (Game->getP1Choice() == Game->getP2Choice())
 			{
-				cout << "Restarting round..." << endl;
-
-				send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
-				send(UnfocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+				Game->ResetRound();
+				//Draw reached, round needs to restart
+				//send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+				//send(UnfocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+				
+				send(FocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
+				send(UnfocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
 			}
 			else if (
 				(Game->getP1Choice() == ROCK && Game->getP2Choice() == SCISSORS) ||
@@ -256,26 +248,22 @@ class NetworkHandlerServer
 				(Game->getP1Choice() == SCISSORS && Game->getP2Choice() == PAPER)
 				)
 			{
+				//Player 1 wins
 				player1Result = 1;
 				player2Result = 2;
-
-				cout << "Player 1 wins " << endl;
 
 				send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 				send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			}
 			else
 			{
+				//Player 2 wins
 				player1Result = 2;
 				player2Result = 1;
-
-				cout << "Player 2 wins" << endl;
 
 				send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 				send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			}
-
-			
 
 			ZeroMemory(buff, 4096);
 
@@ -284,8 +272,6 @@ class NetworkHandlerServer
 
 			string p2Result = to_string(player2Result);
 			send(UnfocusedClient->ClientSocket, p2Result.c_str(), sizeof(p2Result).c_str(), 0);
-
-			cout << "End of Handle Win Function" << endl;
 		}
 
 		void NotifyGameStart() 
@@ -302,7 +288,6 @@ class NetworkHandlerServer
 		void HandleHello(CLIENT& Newclient) 
 		{
 			int byteRecieved = recv(Newclient.ClientSocket, buff, 4096, 0);		//recieves players name
-			//might want to save this somehow so the clients can know who they are up against
 
 			string Username = string(buff, 0, byteRecieved);	//Translates players name to string
 			cout << "User: " << Username << " has connected to the server." << endl;
@@ -318,7 +303,6 @@ class NetworkHandlerServer
 			temp = UnfocusedClient;
 			UnfocusedClient = FocusedClient;
 			FocusedClient = temp;
-			1 + 1;
 		}
 };
 

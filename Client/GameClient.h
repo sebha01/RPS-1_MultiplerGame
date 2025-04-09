@@ -12,8 +12,9 @@ class ClientGame
 	public:
 		ClientGame() 
 		{
-			char player1[30] = "lalala";				//this sets the variable for name entry
-			srand(time(NULL));							//this command is only required at the start and sets the clock
+
+			//char player1[30] = "lalala";				//this sets the variable for name entry
+			//srand(time(NULL));							//this command is only required at the start and sets the clock
 
 			cout << ("Please enter your name? - ");  //this command is used to store the players name for us later on within the game
 			//cin >> playerName;
@@ -96,6 +97,8 @@ class ClientGame
 
 		void HandleResult(int Turnresult)
 		{
+			cout << endl;
+
 			// Example of what the Turnresult could represent
 			if (Turnresult == 1) 
 			{
