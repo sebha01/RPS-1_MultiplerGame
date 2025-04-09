@@ -27,7 +27,7 @@ class ClientGame
 		}
 
 		void PrintTutorial() 
-		{ //Call when recieve welcome packet?
+		{
 			cout << "Welcome " << playerName << ", to Rock Paper Scissor Minus One!" << endl << endl;
 			cout << "Rules:" << endl;
 			cout << "1: You will be matched against another player" << endl;
@@ -59,7 +59,7 @@ class ClientGame
 
 		void TakeTurn(int& finalChoice) 
 		{
-			cout << "Please make two choices between Rock Paper and Scissors, enter a number between 1 and 3, anything else will not be accepted -> ";
+			cout << "Please make two choices between Rock Paper and Scissors, enter a number between 1 and 3, anything else will not be accepted -> " << endl;
 			cout << "1: Rock" << endl;
 			cout << "2: Paper" << endl;
 			cout << "3: Scissors" << endl;
@@ -72,7 +72,7 @@ class ClientGame
 			cout << endl << "Your second choice -> ";
 			int choice2 = validateInput( MIN_CHOICE, MAX_CHOICE);
 
-			cout << "Now pick between your first and second choice to remove to decide your final choice ->" << endl;
+			cout << "Now pick between your first and second choice to decide your final choice, the other that is not picked will be discarded ->" << endl;
 			cout << "1: " << ChoiceToString(static_cast<Choice>(choice1)) << endl;
 			cout << "2: " << ChoiceToString(static_cast<Choice>(choice2)) << endl;
 			cout << "Decide wisely... For it could be your last :D  -> ";
