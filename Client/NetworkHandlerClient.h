@@ -9,7 +9,6 @@ class NetworkHandlerClient
 	private:
 		SOCKET Boss;
 		ClientGame *Game = nullptr;
-
 		bool IsSpectator = false;
 
 	public:

@@ -8,14 +8,13 @@ class ClientGame
 		string playerName;
 		string opponentName;
 		int finalChoice = 0;
-
 	public:
 		ClientGame() 
 		{
 			ShowTitle();
 
 			cout << ("Please enter your name? - ");  //this command is used to store the players name for us later on within the game
-			//cin >> playerName;
+
 			getline(cin, playerName);
 			cout << endl;
 		}
