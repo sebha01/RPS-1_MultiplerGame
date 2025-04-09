@@ -108,19 +108,10 @@ class NetworkHandlerClient
 			{
 				HandleStart();
 			}
-			else if (packetType[0] == INPUT_PACKET) 
-			{
-				//shouldn't recieve!
-				//Send by the client with the chosen cards
-			}
 			else if (packetType[0] == RESULT_PACKET) 
 			{
 				ReadGameResults();
 				//Holds results of a turn after the server has calculated the input packet
-			}
-			else if (packetType[0] == PROMPT_PACKET) 
-			{
-				//Doesnt work for some reason, replaced with MOVE_PACKET \/
 			}
 			else if (packetType[0] == MOVE_PACKET) 
 			{
@@ -143,6 +134,13 @@ class NetworkHandlerClient
 				Game->ShowTitle();
 				cout << "Restarting round..." << endl;
 				SendChoices();
+			}
+			else if (packetType[0] == WAIT_FOR_OTHER_CLIENT_PACKET)
+			{
+				system("CLS");
+				Game->ShowTitle();
+				cout << "Restarting round..." << endl;
+				cout << "Waiting for other player..." << endl;
 			}
 			else 
 			{
@@ -195,7 +193,8 @@ class NetworkHandlerClient
 			send(Boss, SfinalChoice.c_str(), sizeof(SfinalChoice.c_str() + 1), 0);
 		}
 
-		void SendHello() {
+		void SendHello() 
+		{
 			//sends hello packet
 			send(Boss, (char*)&HELLO_PACKET, 1, 0);
 			send(Boss, Game->GetName().c_str(), Game->GetName().size() + 1, 0);	//Send name of Client user to server

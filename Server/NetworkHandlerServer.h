@@ -144,52 +144,15 @@ class NetworkHandlerServer
 
 		void HandleInput(string packetType) 
 		{	//handles packet types
-			if (packetType[0] == HELLO_PACKET) 
-			{
-				//This is now handled else where, so it should never be recieved here.
-				//HandleHello();
-			}
-			else if (packetType[0] == WELCOME_PACKET) 
-			{
-				//Shouldn't recieve
-				//send(*FocusedSocket, (char*)&PROMPT_PACKET, 1, 0);
-				//In older versions when this system was reactionary and not turn based, joining the server would immediately start the game. This is no longer the case
-			}
-			else if (packetType[0] == START_PACKET) 
-			{
-				//This is sent by the server when the game is ready to start
-				//shouldn't recieve!
-			}
-			else if (packetType[0] == INPUT_PACKET) 
+			if (packetType[0] == INPUT_PACKET) 
 			{
 				RecievePlayerCards();
-			}
-			else if (packetType[0] == RESULT_PACKET) 
-			{
-				//This is sent by the server to hold the results of a players input
-				//Shouldn't recieve!
-			}
-			else if (packetType[0] == PROMPT_PACKET) 
-			{
-				//This doesnt work for some reason, replaced with the MOVE_PACKET
-				//Shouldn't recieve!
-			}
-			else if (packetType[0] == MOVE_PACKET) 
-			{
-				//Replaces the prompt packet
-				// Tells the user to make take their turn
-				//Shouldn't recieve!
 			}
 			else if (packetType[0] == END_PACKET) 
 			{
 				cout << "End packet recieved..." << endl;
 				//Means a client has disconnected or the game is over.
 				this->~NetworkHandlerServer();
-			}
-			else if (packetType[0] == CONCLUSION_PACKET) 
-			{
-				//shouldn't Recieve
-				//Send by the server when the game is over
 			}
 			else 
 			{
@@ -236,7 +199,7 @@ class NetworkHandlerServer
 				cout << Game->getp1Decided() << endl << Game->getp2Decided() << endl;
 				// Just send the START_PACKET byte — no name afterward
 				send(FocusedClient->ClientSocket, (char*)&ROUND_RESTART_PACKET, 1, 0);
-				//send(UnfocusedClient->ClientSocket, (char*)&ROUND_RESTART_PACKET, 1, 0);
+				send(UnfocusedClient->ClientSocket, (char*)&WAIT_FOR_OTHER_CLIENT_PACKET, 1, 0);
 				return;
 			}
 			else if (
