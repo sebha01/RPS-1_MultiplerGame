@@ -49,23 +49,14 @@ class NetworkHandlerClient
 			while (connectionResult == -1) 
 			{
 				connectionResult = connect(Boss, (sockaddr*)&hint, sizeof(hint));		//attempt to connect to the server defined in hint
-				//cout << connectionResult;
 			}
-			//if (connectionResult == SOCKET_ERROR) {
-			//	cerr << "cannot connect to server" << endl;
-			//	this->~NetworkHandlerClient();
-			//	return;
-			//}
 		
 			GameLoop();
 		}
 
 		~NetworkHandlerClient() 
-		{  //destructor
-			//closesocket(Boss);
-			cout << "Connection terminated." << endl;
-			cout << "Disconnecting..." << endl;
-			Sleep(5000);
+		{
+			cout << "Destructor Called..." << endl;
 			closesocket(Boss);		//Closes the server socket
 			WSACleanup();
 		}
@@ -83,7 +74,6 @@ class NetworkHandlerClient
 				if ((bytesRecieved == SOCKET_ERROR)) 
 				{
 					cerr << "Server Lost, shutting down." << endl;
-					this->~NetworkHandlerClient();
 					break;
 				}
 				else if ((bytesRecieved == 0)) 
@@ -138,6 +128,7 @@ class NetworkHandlerClient
 			else if (packetType[0] == END_PACKET) 
 			{
 				//The server is shutting down
+				SendByeMessage();
 				this->~NetworkHandlerClient();
 			}
 			else if (packetType[0] == CONCLUSION_PACKET) 
@@ -148,6 +139,7 @@ class NetworkHandlerClient
 			{
 				//hopefully this wont happen anymore
 				cout << "seems like an invalid input..." << packetType << endl;
+				SendByeMessage();
 				this->~NetworkHandlerClient();
 			}
 		}
@@ -175,7 +167,8 @@ class NetworkHandlerClient
 			// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
 			if (Turnresult == 4 || Turnresult == 8)
 			{
-				cout << "Closing the network via destructor" << endl;
+				cout << "Closing the network via ReadGameResults function" << endl;
+				SendByeMessage();
 				this->~NetworkHandlerClient();  // Close the connection after a win/loss
 			}
 		}
@@ -213,6 +206,7 @@ class NetworkHandlerClient
 			recv(Boss, (char*)&result, sizeof(int), 0);
 			Game->HandleResult(result);
 
+			SendByeMessage();
 			this->~NetworkHandlerClient();
 		}
 
@@ -222,6 +216,13 @@ class NetworkHandlerClient
 			string Username = string(buff, 0, byteRecieved);	//Translates players name to string
 
 			Game->GameStarting(Username);
+		}
+
+		void SendByeMessage()
+		{
+			cout << "Connection terminated." << endl;
+			cout << "Disconnecting..." << endl;
+			Sleep(5000);
 		}
 };
 
