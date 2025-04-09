@@ -28,7 +28,7 @@ class ClientGame
 
 		void PrintTutorial() 
 		{ //Call when recieve welcome packet?
-			cout << "Welcome" << playerName << ", to Rock Paper Scissor Minus One!" << endl << endl;
+			cout << "Welcome " << playerName << ", to Rock Paper Scissor Minus One!" << endl << endl;
 			cout << "Rules:" << endl;
 			cout << "1: You will be matched against another player" << endl;
 			cout << "2: When it is your turn, enter your choice of 1-3 to choose from Rock, Paper or Scissors" << endl;

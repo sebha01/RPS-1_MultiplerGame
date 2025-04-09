@@ -64,6 +64,8 @@ class NetworkHandlerClient
 		{  //destructor
 			//closesocket(Boss);
 			cout << "Connection terminated." << endl;
+			cout << "Disconnecting..." << endl;
+			Sleep(5000);
 			closesocket(Boss);		//Closes the server socket
 			WSACleanup();
 		}
