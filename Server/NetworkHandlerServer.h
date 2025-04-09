@@ -95,7 +95,6 @@ class NetworkHandlerServer
 			ListenerSpectator.fd_array[0] = listener;
 
 			//add a new packet here to tell the users who their opponents are, and that the game is starting
-			Sleep(5000);
 			cout << "lobby full, starting game!" << endl;
 			NotifyGameStart();
 			send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);	//prompt the first user to start the game
@@ -104,7 +103,6 @@ class NetworkHandlerServer
 		}
 		~NetworkHandlerServer() 
 		{
-			cout << "NetworkHandlerServer Destructor called..." << endl;
 			send(FocusedClient->ClientSocket, (char*)&END_PACKET, 1, 0);	//Tells each client that the server is shutting down
 			send(UnfocusedClient->ClientSocket, (char*)&END_PACKET, 1, 0);
 			closesocket(UnfocusedClient->ClientSocket);					//Closes both sockets

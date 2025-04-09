@@ -5,11 +5,15 @@
 #include <iomanip>
 #include <algorithm>
 #include "windows.h"
+#include <chrono>
+#include <thread>
 #pragma comment (lib, "ws2_32.lib")
 
 /*
 This SharedResources.h file contains gloabal functions and libraries used by both the client and server projects
-to stop repeating lines of code through the whole solution.
+to stop repeating lines of code through the whole solution. By the way the thread library and majority of other libraries 
+are only used for visual purposes when "loading between screens" the networking itself still uses what was originally there just
+modified for the purposes of a Rock Paper Scissors Minus One game.
 */
 
 using namespace std;
@@ -57,4 +61,25 @@ string ChoiceToString(Choice c)
 		default:
 			return "";
 	}
+}
+
+void startDelay(double secondsToDelay, string messageToDisplay)
+{
+	//Timer splits into 3 and adds a . to the screen then waits a quarter of the time passed in before moving on
+	double third = secondsToDelay / 3;
+	double quarter = secondsToDelay / 4;
+
+	//display loading message or whatever is passed in
+	cout << messageToDisplay;
+
+	for (int i = 0; i < 3; i++)
+	{
+		//idea of the timer obtained from https://www.geeksforgeeks.org/how-to-add-timed-delay-in-cpp/ , then implemented it for microseconds so i could use a double value
+		this_thread::sleep_for(chrono::milliseconds(static_cast<int>(third * 1000)));
+		cout << ".";
+	}
+
+	//last touch so user can see it has finished loading
+	this_thread::sleep_for(chrono::milliseconds(static_cast<int>(quarter * 1000)));
+	cout << endl;
 }

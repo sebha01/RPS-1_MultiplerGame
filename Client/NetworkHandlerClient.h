@@ -57,7 +57,6 @@ class NetworkHandlerClient
 		}
 		~NetworkHandlerClient() 
 		{
-			cout << "Destructor Called..." << endl;
 			closesocket(Boss);		//Closes the server socket
 			WSACleanup();
 		}
@@ -69,6 +68,7 @@ class NetworkHandlerClient
 		void HandleConclusionPacket();
 		void HandleStart();
 		void SendByeMessage();
+		void ResetScreen();
 };
 
 
@@ -151,17 +151,14 @@ void NetworkHandlerClient::HandleInput(string packetType)
 	}
 	else if (packetType[0] == ROUND_RESTART_PACKET)
 	{
-		system("CLS");
-		Game->ShowTitle();
+		ResetScreen();
 		cout << "Restarting round..." << endl;
 		SendChoices();
 	}
 	else if (packetType[0] == WAIT_FOR_OTHER_CLIENT_PACKET)
 	{
-		system("CLS");
-		Game->ShowTitle();
+		ResetScreen();
 		cout << "Restarting round..." << endl;
-		cout << "Waiting for other player..." << endl;
 	}
 	else
 	{
@@ -195,7 +192,6 @@ void NetworkHandlerClient::ReadGameResults()
 	// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
 	if (Turnresult == 4 || Turnresult == 8)
 	{
-		cout << "Closing the network via ReadGameResults function" << endl;
 		SendByeMessage();
 		this->~NetworkHandlerClient();  // Close the connection after a win/loss
 	}
@@ -248,7 +244,11 @@ void NetworkHandlerClient::HandleStart()
 
 void NetworkHandlerClient::SendByeMessage()
 {
-	cout << endl << "Connection terminated." << endl;
-	cout << "Disconnecting..." << endl;
-	Sleep(500000);
+	startDelay(5.0, "Finishing game now, disconnecting from server");
+}
+
+void NetworkHandlerClient::ResetScreen()
+{
+	system("CLS");
+	Game->ShowTitle();
 }

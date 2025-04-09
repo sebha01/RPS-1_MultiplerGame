@@ -67,7 +67,7 @@ void ClientGame::PrintTutorial()
 	cout << "4: You will then have your final choice used against your opponents final choice to decide the winner." << endl;
 	cout << "5: The game concludes when one player wins or loses, until then you will continue to play rounds if you draw against each other." << endl;
 	cout << "6: The loser will be shot and the opposing player will be allowed to live, best of luck :)." << endl;
-	cout << (" Please wait until the lobby is full") << endl;
+	cout << endl << "Please wait until the lobby is full" << endl;
 
 }
 
@@ -90,7 +90,7 @@ int ClientGame::validateInput(int minChoice, int maxChoice)
 
 void ClientGame::TakeTurn(int& finalChoice)
 {
-	cout << "Please make two choices between Rock Paper and Scissors, enter a number between 1 and 3, anything else will not be accepted -> " << endl;
+	cout << endl << "Please make two choices between Rock Paper and Scissors, enter a number between 1 and 3, anything else will not be accepted -> " << endl;
 	cout << "1: Rock" << endl;
 	cout << "2: Paper" << endl;
 	cout << "3: Scissors" << endl;
@@ -103,7 +103,7 @@ void ClientGame::TakeTurn(int& finalChoice)
 	cout << endl << "Your second choice -> ";
 	int choice2 = validateInput(MIN_CHOICE, MAX_CHOICE);
 
-	cout << "Now pick between your first and second choice to decide your final choice, the other that is not picked will be discarded ->" << endl;
+	cout << endl << "Now pick between your first and second choice to decide your final choice, the other that is not picked will be discarded ->" << endl;
 	cout << "1: " << ChoiceToString(static_cast<Choice>(choice1)) << endl;
 	cout << "2: " << ChoiceToString(static_cast<Choice>(choice2)) << endl;
 	cout << "Decide wisely... For it could be your last :D  -> ";
@@ -122,7 +122,7 @@ void ClientGame::TakeTurn(int& finalChoice)
 
 	cout << endl << "Your final choice is " << ChoiceToString(static_cast<Choice>(finalChoice)) << endl;
 
-	cout << "Waiting for other player to decide... " << endl;
+	cout << endl << "Waiting for other player to decide... " << endl;
 }
 
 void ClientGame::HandleResult(int Turnresult)
@@ -132,15 +132,16 @@ void ClientGame::HandleResult(int Turnresult)
 	// Example of what the Turnresult could represent
 	if (Turnresult == 1)
 	{
-		cout << "You win! Congratulations!" << endl;
+		cout << "You win! Congratulations! Now the other dies :)" << endl;
 	}
 	else if (Turnresult == 2)
 	{
 		cout << "You lost! Better luck next time." << endl;
+		cout << "Oops!I completely forgot, there is no next time hahaha." << endl;
 	}
 	else if (Turnresult == 0)
 	{
-		cout << "Draw!" << endl;
+		cout << "It's a draw!" << endl;
 	}
 	else
 	{
@@ -150,10 +151,12 @@ void ClientGame::HandleResult(int Turnresult)
 
 void ClientGame::GameStarting(string inOpponent)
 {
+	startDelay(6.0, "Lobby full, connecting you to your opponent");
 	system("CLS");
 	opponentName = inOpponent;
 	ShowTitle();
-	cout << "You have been matched against " << inOpponent << "." << endl << "Game is starting..." << endl;
+	cout << "You have been matched against " << inOpponent << "." << endl;
+	startDelay(5.0, "Game is starting");
 }
 
 void ClientGame::SetOpponentName(string input)
