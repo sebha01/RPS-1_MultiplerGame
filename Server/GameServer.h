@@ -46,9 +46,6 @@ class GameServer
 
 		GameServer() {}
 
-		/*
-		
-		
 		void ResetRound()
 		{
 			// Reset player choices and decision flags
@@ -56,17 +53,6 @@ class GameServer
 			playerTwoChoice = 0;
 			p1Decided = false;
 			p2Decided = false;
-
-			// Optionally reset points or other game variables if needed
-			// playerOnePoints = 0;
-			// playerTwoPoints = 0;
-
-			// Optional: Notify players about the new round
-			send(FocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
-			send(UnfocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
 		}
-		
-
-		*/
 };
 

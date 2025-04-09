@@ -73,9 +73,6 @@ class NetworkHandlerServer
 
 				sockaddr_in client;						//used for collecting infomation about the client, although these are currently unused they could be printed to server for better client tracking
 				int clientSize = sizeof(client);		//If these are removed, their references can be set to nullptr.
-				//CLIENT NewClient;
-				//NewClient.ClientSocket = accept(listener, (sockaddr*)&client, &clientSize);					//Wait for a client to attempt to connect, then set it to NEWCLIENT																//Adds the new client to the master set
-				//cout << "Sending hello to joining client (" << NewClient.ClientSocket << ")" << endl;		//Prints the socket address number, not the name. This can be used for tracking
 
 				if ((FocusedClient == nullptr) and (socketCount == 0)) 
 				{
@@ -97,12 +94,9 @@ class NetworkHandlerServer
 
 			}
 
-			//closesocket(listener);		//All clients have joined, this socket is not required anymore
 			unsigned long ul = 1;
 			cout << ioctlsocket(listener, FIONBIO, (unsigned long*)&ul);		//Sets the listener socket to non blocking
 			ListenerSpectator.fd_array[0] = listener;
-			//FocusedSocket = &master.fd_array[1];	//might randomise this
-			//UnfocusedSocket = &master.fd_array[2];
 
 			//add a new packet here to tell the users who their opponents are, and that the game is starting
 			Sleep(5000);
@@ -115,14 +109,13 @@ class NetworkHandlerServer
 
 		~NetworkHandlerServer() 
 		{
-			cout << "Shutdown!!!" << endl;
+			cout << "NetworkHandlerServer Destructor called..." << endl;
 			send(FocusedClient->ClientSocket, (char*)&END_PACKET, 1, 0);	//Tells each client that the server is shutting down
 			send(UnfocusedClient->ClientSocket, (char*)&END_PACKET, 1, 0);
 			closesocket(UnfocusedClient->ClientSocket);					//Closes both sockets
 			closesocket(FocusedClient->ClientSocket);
 			closesocket(listener);
 			WSACleanup();									//Clean up network
-			//delete *Game;									//Delete the game
 		}
 
 		void GameLoop() 
@@ -191,9 +184,9 @@ class NetworkHandlerServer
 				// Tells the user to make take their turn
 				//Shouldn't recieve!
 			}
-
 			else if (packetType[0] == END_PACKET) 
 			{
+				cout << "End packet recieved..." << endl;
 				//Means a client has disconnected or the game is over.
 				this->~NetworkHandlerServer();
 			}
@@ -213,9 +206,6 @@ class NetworkHandlerServer
 
 		void RecievePlayerCards() 
 		{
-			//Temp code 
-			//-----------------#
-			
 			//Input handling
 			int byteRecieved = recv(FocusedClient->ClientSocket, buff, 8, 0);			//Recieves the first card as an integer
 			string choice = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
@@ -232,31 +222,35 @@ class NetworkHandlerServer
 			else if (Game->getp1Decided() == true && Game->getp2Decided() == false)
 			{
 				Game->setPlayer2Choice(ch);
-				//SwapClientFocus();
-				//send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
 				HandleWin();
-				//return;
 			}
 			else if (Game->getp1Decided() == true && Game->getp2Decided() == true)
 			{
 				HandleWin();
-				//return;
 			}
 		}
 
 		void HandleWin() 
 		{
-
+			cout << "Start of handle win function" << endl;
 			//--
 			// HANDLE WIN IMPORTANT TO PROGRESS
 			//--
 			int player1Result = 0;
 			int player2Result = 0;
 
+			cout << "Player One Choice -> " << ChoiceToString(static_cast<Choice>(Game->getP1Choice())) << endl;
+			cout << "Player Two Choice -> " << ChoiceToString(static_cast<Choice>(Game->getP2Choice())) << endl;
+
 			if (Game->getP1Choice() == Game->getP2Choice())
 			{
 				player1Result = 0;
 				player2Result = 0;
+
+				cout << "Restarting round..." << endl;
+
+				send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
+				send(UnfocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
 			}
 			else if (
 				(Game->getP1Choice() == ROCK && Game->getP2Choice() == SCISSORS) ||
@@ -266,20 +260,28 @@ class NetworkHandlerServer
 			{
 				player1Result = 1;
 				player2Result = 2;
+
+				cout << "Player 1 wins " << endl;
+
+				send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
+				send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			}
 			else
 			{
 				player1Result = 2;
 				player2Result = 1;
+
+				cout << "Player 2 wins" << endl;
+
+				send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
+				send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			}
 
-			send(FocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
-			send(UnfocusedClient->ClientSocket, (char*)&CONCLUSION_PACKET, 1, 0);
 			ZeroMemory(buff, 4096);
-			/*send(FocusedClient->ClientSocket, to_string(player1Result).c_str(), 8, 0);
-			send(UnfocusedClient->ClientSocket, to_string(player2Result).c_str(), 8, 0);*/
 			send(FocusedClient->ClientSocket, (char*)&player1Result, sizeof(int), 0);
 			send(UnfocusedClient->ClientSocket, (char*)&player2Result, sizeof(int), 0);
+
+			cout << "End of Handle Win Function" << endl;
 		}
 
 		void NotifyGameStart() 
@@ -300,6 +302,7 @@ class NetworkHandlerServer
 
 			string Username = string(buff, 0, byteRecieved);	//Translates players name to string
 			cout << "User: " << Username << " has connected to the server." << endl;
+
 			Newclient.ClientName = Username;
 
 			send(Newclient.ClientSocket, (char*)&WELCOME_PACKET, 1, 0);		//sends welcome packet to client
@@ -312,8 +315,6 @@ class NetworkHandlerServer
 			UnfocusedClient = FocusedClient;
 			FocusedClient = temp;
 			1 + 1;
-
-			//send(*FocusedSocket, (char*)&MOVE_PACKET, 1, 0);		//handled elsewhere now
 		}
 };
 

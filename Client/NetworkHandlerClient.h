@@ -146,6 +146,7 @@ class NetworkHandlerClient
 
 		void ReadGameResults()
 		{
+			cout << "Entered Read Game Results function" << endl;
 			int Turnresult;         // Holds the result of the turn to be passed into the game client
 			int byteRecieved;       // Used to store the number of bytes received
 
@@ -162,7 +163,7 @@ class NetworkHandlerClient
 			Turnresult = stoi(Tempstring);
 
 			// Handle the game result in the game client
-			Game->HandleResult(Turnresult);  // Pass the result directly to the game client to handle the win/loss
+			//Game->HandleResult(Turnresult);  // Pass the result directly to the game client to handle the win/loss
 
 			// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
 			if (Turnresult == 4 || Turnresult == 8)
@@ -171,6 +172,8 @@ class NetworkHandlerClient
 				SendByeMessage();
 				this->~NetworkHandlerClient();  // Close the connection after a win/loss
 			}
+
+			cout << "End of Read Game Results function" << endl;
 		}
 
 		void SendChoices() 
@@ -183,7 +186,6 @@ class NetworkHandlerClient
 
 			//Sends input packet
 			send(Boss, (char*)&INPUT_PACKET, 1, 0);		
-			//cout << "sending card1: " << Scard1 << endl;
 			send(Boss, SfinalChoice.c_str(), sizeof(SfinalChoice.c_str() + 1), 0);
 		}
 
@@ -195,16 +197,20 @@ class NetworkHandlerClient
 
 		void HandleConclusionPacket() 
 		{
-			int byteRecieved;
-			int result = 0;
+			//int byteRecieved;
+			//int result = 0;
 			ZeroMemory(buff, 4096);
 
 			//byteRecieved = recv(Boss, buff, 8, 0);						//Recieves the second game result, the updated board.
 			//string Tempstring = string(buff, 0, byteRecieved);	//Translates the result into a plaintext string
 
 			//result = stoi(Tempstring);
-			recv(Boss, (char*)&result, sizeof(int), 0);
-			Game->HandleResult(result);
+			
+			//result = recv(Boss, buff, 4096, 0);
+			
+			//cout << result << " This is at HandleConclusionPacket" << endl;
+			
+			//Game->HandleResult(result);
 
 			SendByeMessage();
 			this->~NetworkHandlerClient();
@@ -222,7 +228,7 @@ class NetworkHandlerClient
 		{
 			cout << "Connection terminated." << endl;
 			cout << "Disconnecting..." << endl;
-			Sleep(5000);
+			Sleep(500000);
 		}
 };
 

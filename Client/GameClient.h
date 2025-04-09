@@ -79,29 +79,41 @@ class ClientGame
 
 			finalChoice = validateInput( 1, 2);
 
+			switch (finalChoice)
+			{
+				case 1:
+					finalChoice = choice1;
+					break;
+				case 2:
+					finalChoice = choice2;
+					break;
+			}
+
+			cout << endl << "Your final choice is " << ChoiceToString(static_cast<Choice>(finalChoice)) << endl;
+
 			cout << "Waiting for other player to decide... " << endl;
 		}
 
-		void HandleResult(int Turnresult)
-		{
-			// Example of what the Turnresult could represent
-			if (Turnresult == 1) 
-			{
-				cout << "You win! Congratulations!" << endl;
-			}
-			else if (Turnresult == 2)
-			{
-				cout << "You lost! Better luck next time." << endl;
-			}
-			else if (Turnresult == 0)
-			{
-				cout << "Draw!" << endl;
-			}
-			else
-			{
-				cout << "Unexpected error" << Turnresult << endl <<endl;
-			}
-		}
+		//void HandleResult(int Turnresult)
+		//{
+		//	// Example of what the Turnresult could represent
+		//	if (Turnresult == 1) 
+		//	{
+		//		cout << "You win! Congratulations!" << endl;
+		//	}
+		//	else if (Turnresult == 2)
+		//	{
+		//		cout << "You lost! Better luck next time." << endl;
+		//	}
+		//	else if (Turnresult == 0)
+		//	{
+		//		cout << "Draw!" << endl;
+		//	}
+		//	else
+		//	{
+		//		cout << "Unexpected error" << Turnresult << endl <<endl;
+		//	}
+		//}
 
 		void GameStarting(string inOpponent)  
 		{
