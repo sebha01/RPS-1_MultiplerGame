@@ -1,58 +1,78 @@
 #pragma once
-
 #include "../SharedResources.h"
 
-/*
-----------------------------------------------------------------
-						CLASS DEFINITION
-----------------------------------------------------------------
-*/
 
 class GameServer
 {
 	private:
-		int player1Choice = 0;
-		int player2Choice = 0;
+		int playerOneChoice = 0;
+		int playerTwoChoice = 0;
 
+		bool p1Decided = false;
+		bool p2Decided = false;
 	public:
-
-		GameServer() 
-		{
-			player1Choice = 0;
-			player2Choice = 0;
-		}
-
-		void RecievePlayerChoices(int c1, int c2) 
-		{
-			//This would be recieved as a packet from the client instead of a function call
-			//recieve card one				
-			//receive card two
-			this->player1Choice = c1;
-			this->player2Choice = c2;
-		}
-
-		int calculateResult(int p1Choice, int p2Choice) 
-		{
-			//Return 0 if tie, 1 if player 1 and 2 if player 2
-
-			if (p1Choice == p2Choice) { return 0; };
-
-			//Calculate winning plays for p1, if anything else p2 wins
-			if ((p1Choice == ROCK && p2Choice == SCISSORS) ||
-				(p1Choice == PAPER && p2Choice == ROCK) ||
-				(p1Choice == SCISSORS && p2Choice == PAPER))
-			{
-				return 1;
-			}
-
-			//p2 wins if nothing else complete as we have deduced it is not a draw and p2 has not won
-			return 2;
-		}
-
-		void SendResult(int result, CLIENT* client) 
-		{
-			// Send result back to the client
-			send(client->ClientSocket, (char*)&result, sizeof(result), 0);
-		}
+		GameServer() {}
+		void ResetRound();
+		//Setters
+		void setPlayer1Choice(int c);
+		void setPlayer2Choice(int ch);
+		//Getters
+		bool getp1Decided();
+		bool getp2Decided();
+		int getP1Choice();
+		int getP2Choice();	
 };
 
+
+
+
+
+
+
+
+/*
+----------------
+MEMBER FUNCTIONS
+----------------
+*/
+
+void GameServer::ResetRound()
+{
+	// Reset player choices and decision flags
+	playerOneChoice = 0;
+	playerTwoChoice = 0;
+	p1Decided = false;
+	p2Decided = false;
+}
+
+void GameServer::setPlayer1Choice(int c)
+{
+	this->playerOneChoice = c;
+	p1Decided = true;
+}
+
+void GameServer::setPlayer2Choice(int ch)
+{
+	this->playerTwoChoice = ch;
+	p2Decided = true;
+}
+
+bool GameServer::getp1Decided()
+{
+	return p1Decided;
+}
+
+bool GameServer::getp2Decided()
+{
+	return p2Decided;
+}
+
+int GameServer::getP1Choice()
+{
+	return playerOneChoice;
+}
+
+int GameServer::getP2Choice()
+{
+	return playerTwoChoice;
+}
