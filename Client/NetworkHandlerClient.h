@@ -120,6 +120,8 @@ class NetworkHandlerClient
 			}
 			else if (packetType[0] == PROMPT_PACKET) 
 			{
+				system("CLS");
+				Game->ShowTitle();
 				SendChoices();
 				//Doesnt work for some reason, replaced with MOVE_PACKET \/
 			}

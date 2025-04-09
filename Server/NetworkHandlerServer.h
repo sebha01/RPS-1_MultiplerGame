@@ -207,8 +207,6 @@ class NetworkHandlerServer
 			string choice = string(buff, 0, byteRecieved);		//Translates the recieved infomation into a string
 			int ch = stoi(choice);										//Translates the string into a card
 
-			cout << endl << byteRecieved << endl << ch << endl << choice << endl << endl;
-
 			if (Game->getp1Decided() == false && Game->getp2Decided() == false)
 			{
 				Game->setPlayer1Choice(ch);
@@ -239,8 +237,9 @@ class NetworkHandlerServer
 				//send(FocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
 				//send(UnfocusedClient->ClientSocket, (char*)&MOVE_PACKET, 1, 0);
 				
-				send(FocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
-				send(UnfocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
+				send(FocusedClient->ClientSocket, (char*)&PROMPT_PACKET, 1, 0);
+				
+				//send(UnfocusedClient->ClientSocket, (char*)&START_PACKET, 1, 0);
 			}
 			else if (
 				(Game->getP1Choice() == ROCK && Game->getP2Choice() == SCISSORS) ||
