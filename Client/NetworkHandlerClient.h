@@ -98,7 +98,7 @@ void NetworkHandlerClient::GameLoop()
 
 		if ((bytesRecieved == SOCKET_ERROR))
 		{
-			cerr << "Server Lost, shutting down." << endl;
+			cerr << "Server Lost, shutting down." << endl; 
 			break;
 		}
 		else if ((bytesRecieved == 0))
@@ -160,6 +160,7 @@ void NetworkHandlerClient::HandleInput(string packetType)
 	{
 		ResetScreen();
 		cout << "Restarting round..." << endl;
+		cout << "Waiting for other player to make their choice..." << endl;
 	}
 	else
 	{
@@ -189,13 +190,6 @@ void NetworkHandlerClient::ReadGameResults()
 
 	// Handle the game result in the game client
 	Game->HandleResult(Turnresult);  // Pass the result directly to the game client to handle the win/loss
-
-	// If the turn result indicates a win (e.g., 4 = win, 8 = opponent win), close the connection
-	if (Turnresult == 4 || Turnresult == 8)
-	{
-		SendByeMessage();
-		this->~NetworkHandlerClient();  // Close the connection after a win/loss
-	}
 }
 
 void NetworkHandlerClient::SendChoices()
