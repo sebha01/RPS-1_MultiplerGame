@@ -224,8 +224,6 @@ void NetworkHandlerServer::HandleWin()
 	if (Game->getP1Choice() == Game->getP2Choice())
 	{
 		Game->ResetRound();
-		cout << Game->getp1Decided() << endl << Game->getp2Decided() << endl;
-		// Just send the START_PACKET byte — no name afterward
 		send(FocusedClient->ClientSocket, (char*)&ROUND_RESTART_PACKET, 1, 0);
 		send(UnfocusedClient->ClientSocket, (char*)&WAIT_FOR_OTHER_CLIENT_PACKET, 1, 0);
 		return;
