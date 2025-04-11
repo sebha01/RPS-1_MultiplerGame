@@ -173,6 +173,7 @@ void NetworkHandlerServer::HandleInput(string packetType)
 {	//handles packet types
 	if (packetType[0] == INPUT_PACKET)
 	{
+		cout << "Input packet recieved from client" << endl;
 		RecievePlayerCards();
 	}
 	else if (packetType[0] == END_PACKET)

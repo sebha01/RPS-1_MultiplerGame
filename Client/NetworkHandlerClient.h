@@ -48,6 +48,7 @@ class NetworkHandlerClient
 
 			//connect to server
 			int connectionResult = -1;
+			cout << "Waiting to join an open lobby..." << endl;
 			while (connectionResult == -1) 
 			{
 				connectionResult = connect(Boss, (sockaddr*)&hint, sizeof(hint));		//attempt to connect to the server defined in hint
